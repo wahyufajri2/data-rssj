@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Services\Auth\AuthService;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Validation\Rules;
-use App\Http\Requests\Auth\LoginRequest;
+use Carbon\Carbon;
 
 class AuthenticatedSessionController extends Controller
 {
+    // ==========================================
+    // 1. FITUR LOGIN
+    // ==========================================
+
     /**
-     * Tampilkan form login
+     * Menampilkan form login
      */
     public function create(): View|RedirectResponse
     {
@@ -28,34 +30,90 @@ class AuthenticatedSessionController extends Controller
         }
 
         return view('pages.auth.login', [
-            'title' => 'Login',
+            'title' => 'Login EMBRACE',
         ]);
     }
 
     /**
      * Proses login
      */
-    public function store(LoginRequest $request, AuthService $authService): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $result = $authService->login(
-            $request->username,
-            $request->password,
-            $request->boolean('remember')
-        );
+        $credentials = $request->validate([
+            'no_hp' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
 
-        if (!$result['success']) {
-            return back()->withErrors([
-                'username' => 'Username atau Password salah.',
-            ])->withInput($request->only('username'));
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            return $this->redirectBasedOnRole();
         }
 
-        $request->session()->regenerate();
+        return back()->withErrors([
+            'no_hp' => 'Nomor HP atau Password salah.',
+        ])->withInput($request->only('no_hp'));
+    }
 
-        return $this->redirectBasedOnRole();
+    // ==========================================
+    // 2. FITUR REGISTRASI (SEAMLESS ONBOARDING)
+    // ==========================================
+
+    /**
+     * Menampilkan form registrasi pasien baru.
+     */
+    public function showRegisterForm(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return $this->redirectBasedOnRole();
+        }
+
+        return view('pages.auth.register', [
+            'title' => 'Daftar Akun EMBRACE',
+        ]);
     }
 
     /**
-     * Tampilkan Form Lupa Password
+     * Memproses pendaftaran pasien baru (Bebas Hambatan)
+     */
+    public function registerUser(Request $request): RedirectResponse
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'no_hp'    => ['required', 'string', 'max:20', 'unique:users,no_hp'],
+            'email'    => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'no_hp.unique' => 'Nomor HP ini sudah terdaftar. Silakan masuk atau gunakan nomor lain.',
+            'email.unique' => 'Email ini sudah terdaftar.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.'
+        ]);
+
+        // 2. Simpan user baru ke database
+        $user = User::create([
+            'name'     => $request->name,
+            'no_hp'    => $request->no_hp,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => 'patient',
+        ]);
+
+        // 3. SEAMLESS ONBOARDING: Langsung login-kan user
+        Auth::login($user);
+
+        // 4. Regenerasi session untuk keamanan (Sangat Penting)
+        $request->session()->regenerate();
+
+        // 5. Arahkan langsung ke halaman skrining kecemasan
+        return redirect()->route('pasien.skrining-awal')->with('status', 'Pendaftaran berhasil! Selamat datang di aplikasi EMBRACE.');
+    }
+
+    // ==========================================
+    // 3. FITUR LUPA PASSWORD (OTP VIA NO_HP)
+    // ==========================================
+
+    /**
+     * Tampilkan Form Lupa Password (Input Nomor HP)
      */
     public function showForgotForm(): View
     {
@@ -65,103 +123,104 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Kirim Link Reset Password ke Email
+     * Generate dan Kirim OTP ke WhatsApp/SMS
      */
-    public function sendResetLink(Request $request): RedirectResponse
+    public function sendResetOtp(Request $request): RedirectResponse
     {
-        // 1. Validasi Input
         $request->validate([
-            'email' => [
-                'required', 
-                'email', 
-                'exists:users,email' // <--- INI KUNCINYA
-            ],
+            'no_hp' => ['required', 'exists:users,no_hp'],
         ], [
-            // Custom pesan error jika email tidak ada
-            'email.exists' => 'Email ini belum terdaftar di sistem kami.',
+            'no_hp.exists' => 'Nomor HP ini belum terdaftar di sistem kami.',
         ]);
 
-        // 2. Kirim link menggunakan Password Broker Laravel
-        $status = Password::sendResetLink(
-            $request->only('email')
+        $otp = rand(100000, 999999);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['no_hp' => $request->no_hp],
+            [
+                'token' => Hash::make($otp),
+                'created_at' => Carbon::now()
+            ]
         );
 
-        // 3. Cek hasil pengiriman
-        if ($status === Password::RESET_LINK_SENT) {
-            // Menggunakan back() agar tetap di halaman forgot password, bukan ke login
-            return back()->with('status', __($status));
-        }
+        // TODO: Panggil API WhatsApp (Fonnte/Watzap) di sini
+        \Illuminate\Support\Facades\Log::info("OTP Lupa Password untuk {$request->no_hp} : {$otp}");
 
-        // Jika gagal kirim
-        return back()
-            ->withInput($request->only('email'))
-            ->withErrors(['email' => __($status)]);
-    }
-
-    /**
-     * Tampilkan Form Reset Password
-     */
-    public function showResetForm(Request $request, $token = null): View
-    {
-        return view('pages.auth.reset-password', [
-            'title' => 'Reset Password',
-            'token' => $token,
-            'email' => $request->email,
+        return redirect()->route('password.reset.form')->with([
+            'status' => 'Kode OTP telah dikirim ke WhatsApp/SMS Anda.',
+            'no_hp' => $request->no_hp
         ]);
     }
 
     /**
-     * Proses Reset Password Baru
+     * Tampilkan Form Input OTP dan Password Baru
+     */
+    public function showResetForm(Request $request): View
+    {
+        return view('pages.auth.reset-password', [
+            'title' => 'Verifikasi OTP & Reset Password',
+            'no_hp' => $request->session()->get('no_hp'),
+        ]);
+    }
+
+    /**
+     * Validasi OTP dan Simpan Password Baru
      */
     public function resetPassword(Request $request): RedirectResponse
     {
-        // 1. Validasi Input Password Baru
         $request->validate([
-            'token' => ['required'],
-            'email' => ['required', 'email'],
+            'no_hp' => ['required', 'exists:users,no_hp'],
+            'otp' => ['required', 'numeric', 'digits:6'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // 2. Proses Reset
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
+        $resetRecord = DB::table('password_reset_tokens')
+            ->where('no_hp', $request->no_hp)
+            ->first();
 
-                $user->save();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        // 3. Redirect jika sukses
-        if ($status === Password::PASSWORD_RESET) {
-            return redirect()->route('login')->with('status', __($status));
+        if (!$resetRecord) {
+            return back()->withErrors(['otp' => 'Sesi reset password tidak ditemukan. Silakan minta OTP baru.']);
         }
 
-        // Jika gagal (Token expired atau email salah)
-        return back()
-            ->withInput($request->only('email'))
-            ->withErrors(['email' => __($status)]);
+        if (Carbon::parse($resetRecord->created_at)->addMinutes(15)->isPast()) {
+            DB::table('password_reset_tokens')->where('no_hp', $request->no_hp)->delete();
+            return back()->withErrors(['otp' => 'Kode OTP sudah kedaluwarsa. Silakan minta kode baru.']);
+        }
+
+        if (!Hash::check($request->otp, $resetRecord->token)) {
+            return back()->withErrors(['otp' => 'Kode OTP yang Anda masukkan salah.']);
+        }
+
+        $user = User::where('no_hp', $request->no_hp)->first();
+        $user->forceFill([
+            'password' => Hash::make($request->password)
+        ])->setRememberToken(Str::random(60));
+        $user->save();
+
+        DB::table('password_reset_tokens')->where('no_hp', $request->no_hp)->delete();
+
+        return redirect()->route('login')->with('status', 'Password berhasil diubah. Silakan masuk menggunakan password baru.');
     }
 
-    /**
-     * Logout
-     */
-    public function destroy(): RedirectResponse
-    {
-        Auth::guard('web')->logout(); // Logout guard web default
+    // ==========================================
+    // 4. FITUR LOGOUT & REDIRECT HELPER
+    // ==========================================
 
-        session()->invalidate();
-        session()->regenerateToken();
+    /**
+     * Proses Logout
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('login');
     }
 
     /**
-     * Redirect berdasarkan peran
+     * Helper untuk menentukan rute redirect berdasarkan role
      */
     protected function redirectBasedOnRole(): RedirectResponse
     {
@@ -171,13 +230,13 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('login');
         }
 
-        $roleEnum = Role::fromId((int) $user->peran_id); 
-
-        if (!$roleEnum) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['username' => 'Akun tidak memiliki peran yang valid.']);
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'patient') {
+            return redirect()->route('pasien.skrining-awal');
         }
 
-        return redirect()->route($roleEnum->dashboardRoute());
+        Auth::logout();
+        return redirect()->route('login')->withErrors(['no_hp' => 'Akun tidak memiliki akses yang valid.']);
     }
 }

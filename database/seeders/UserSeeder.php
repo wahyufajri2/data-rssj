@@ -17,30 +17,39 @@ class UserSeeder extends Seeder
         $now = Carbon::now();
 
         $users = [
+            // 1. Akun Admin (Diambil dari data sebelumnya)
             [
-                'name'              => 'admin',
-                'fullname'          => 'Admin BKA',
-                'email'             => 'kemahasiswaan@unisayogya.ac.id',
-                'email_verified_at' => $now,
-                'password'          => Hash::make('bka$unisa#unggul'),
+                'name'              => 'Admin Embrace', // Menggabungkan name dan fullname
                 'no_hp'             => '082134910932',
-                'peran_id'          => 1,
-                'prodi_id'          => null,
-                'active'            => true,
+                'email'             => 'embrace@unisayogya.ac.id',
+                'role'              => 'admin', // Menggunakan enum dari migration baru
+                'email_verified_at' => $now,
+                'password'          => Hash::make('password123'), // Password default admin
+                'remember_token'    => null,
+                'created_at'        => $now,
+                'updated_at'        => $now,
+            ],
+            // 2. Akun Pasien Contoh
+            [
+                'name'              => 'Pasien Contoh',
+                'no_hp'             => '081234567890',
+                'email'             => 'pasien@example.com', // Bisa diisi null karena di migration diset nullable()
+                'role'              => 'patient',
+                'email_verified_at' => $now,
+                'password'          => Hash::make('password123'), // Password default pasien
                 'remember_token'    => null,
                 'created_at'        => $now,
                 'updated_at'        => $now,
             ],
         ];
 
-        DB::table('users')->upsert($users, ['email'], [
+        // Menggunakan 'no_hp' sebagai parameter unik (kunci) untuk upsert,
+        // karena no_hp sekarang digunakan sebagai username mutlak saat login.
+        DB::table('users')->upsert($users, ['no_hp'], [
             'name',
-            'fullname',
+            'email',
+            'role',
             'password',
-            'no_hp',
-            'peran_id',
-            'prodi_id',
-            'active',
             'email_verified_at',
             'updated_at'
         ]);

@@ -2,13 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Enums\Role;
 use Illuminate\Support\Facades\Auth;
 
 class GreetingHelper
 {
     /**
-     * Mengambil data sapaan, ikon, dan nama lengkap pengguna
+     * Mengambil data sapaan, ikon, dan nama pengguna
      *
      * @return object
      */
@@ -33,12 +32,12 @@ class GreetingHelper
             $ikonMatahari = false;
         }
 
-        // 3. Ambil data fullname (Cek Auth untuk mencegah error)
+        // 3. Ambil data nama (Cek Auth untuk mencegah error)
         $namaLengkap = 'Tamu';
+
         if (Auth::check()) {
-            $namaLengkap = in_array(Auth::user()->peran_id, [Role::ADMIN->value, Role::VERIFIKATOR->value])
-                ? Auth::user()->fullname
-                : session('fullname') ?? Auth::user()->fullname;
+            // Mengambil langsung dari kolom 'name' sesuai struktur tabel terbaru
+            $namaLengkap = Auth::user()->name;
         }
 
         // Kembalikan data dalam bentuk Object agar mudah dipanggil di Blade

@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use App\Enums\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +11,7 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, string $requiredRole): Response
     {
-        // 1. Belum login
+        // 1. Jika belum login, lempar ke halaman login
         if (!Auth::check()) {
             return redirect()->route('login')->with('toast', [
                 'type' => 'error',
@@ -22,36 +21,26 @@ class CheckRole
 
         $user = Auth::user();
 
-        // 2. Ambil role dari Enum
-        $roleEnum = Role::fromId((int) $user->peran_id);
+        // 2. Jika role yang login TIDAK SAMA dengan role yang diizinkan di route
+        if ($user->role !== $requiredRole) {
 
-        // 3. Role tidak valid → logout paksa
-        if (!$roleEnum) {
-            Auth::logout();
-
-            $toast = [
-                'type' => 'error',
-                'message' => 'Terjadi kesalahan pada akun Anda. Silakan login kembali.',
-            ];
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            session()->flash('toast', $toast);
-
-            return redirect()->route('login');
-        }
-
-        // 4. Role tidak sesuai → fallback redirect
-        if ($roleEnum->key() !== $requiredRole) {
             session()->flash('toast', [
                 'type' => 'error',
                 'message' => 'Anda tidak memiliki akses ke halaman tersebut.',
             ]);
 
-            return redirect()->route($roleEnum->dashboardRoute());
+            // 3. Fallback: Arahkan kembali ke dashboard masing-masing sesuai role aslinya
+            if ($user->role === 'admin') {
+                // Pastikan route 'admin.dashboard' ada di web.php
+                return redirect()->route('admin.dashboard');
+            }
+
+            // Default fallback untuk pasien
+            // Pastikan route 'screening' ada di web.php
+            return redirect()->route('screening');
         }
 
+        // 4. Jika role sesuai, izinkan akses berlanjut
         return $next($request);
     }
 }

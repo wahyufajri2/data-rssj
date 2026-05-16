@@ -6,15 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? '-' }}</title>
+    <title>{{ $title ?? 'EMBRACE' }}</title>
 
-    <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Alpine.js -->
-    {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
-
-    <!-- Theme Store -->
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('theme', {
@@ -43,39 +38,9 @@
                     }
                 }
             });
-
-            Alpine.store('sidebar', {
-                // Initialize based on screen size
-                isExpanded: window.innerWidth >= 1280, // true for desktop, false for mobile
-                isMobileOpen: false,
-                isHovered: false,
-
-                toggleExpanded() {
-                    this.isExpanded = !this.isExpanded;
-                    // When toggling desktop sidebar, ensure mobile menu is closed
-                    this.isMobileOpen = false;
-                },
-
-                toggleMobileOpen() {
-                    this.isMobileOpen = !this.isMobileOpen;
-                    // Don't modify isExpanded when toggling mobile menu
-                },
-
-                setMobileOpen(val) {
-                    this.isMobileOpen = val;
-                },
-
-                setHovered(val) {
-                    // Only allow hover effects on desktop when sidebar is collapsed
-                    if (window.innerWidth >= 1280 && !this.isExpanded) {
-                        this.isHovered = val;
-                    }
-                }
-            });
         });
     </script>
 
-    <!-- Apply dark mode immediately to prevent flash -->
     <script>
         (function() {
             const savedTheme = localStorage.getItem('theme');
@@ -96,42 +61,24 @@
             display: none !important;
         }
     </style>
-
-
 </head>
 
-<body x-data="{ 'loaded': true }" x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
-const checkMobile = () => {
-    if (window.innerWidth < 1280) {
-        $store.sidebar.setMobileOpen(false);
-        $store.sidebar.isExpanded = false;
-    } else {
-        $store.sidebar.isMobileOpen = false;
-        $store.sidebar.isExpanded = true;
-    }
-};
-window.addEventListener('resize', checkMobile);">
+<body x-data="{ 'loaded': true }" class="bg-gray-50 dark:bg-gray-900">
 
     {{-- preloader --}}
     <x-common.preloader />
-    {{-- preloader end --}}
 
-    <div class="min-h-screen xl:flex">
-        @include('layouts.backdrop')
-        @include('layouts.sidebar')
+    <div class="min-h-screen flex flex-col">
 
-        <div class="flex-1 transition-all duration-300 ease-in-out"
-            :class="{
-                'xl:ml-[290px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
-                'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
-                'ml-0': $store.sidebar.isMobileOpen
-            }">
-            <!-- app header start -->
-            @include('layouts.app-header')
-            <!-- app header end -->
+        @include('layouts.patient-header')
+
+        <main class="flex-grow w-full">
             @yield('content')
-        </div>
+        </main>
 
+        <footer class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+            &copy; {{ date('Y') }} EMBRACE | Embrace Your Journy - Ease Your Mind
+        </footer>
     </div>
 
     <x-ui.toast />

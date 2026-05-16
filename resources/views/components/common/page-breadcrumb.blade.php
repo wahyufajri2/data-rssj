@@ -17,7 +17,7 @@
             <li>
                 <a href="/"
                     class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400 transition-colors">
-                    SIM Prestasi
+                    Embrace
                 </a>
             </li>
 
