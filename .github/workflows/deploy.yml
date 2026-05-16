@@ -1,9 +1,9 @@
-name: Deploy to Hostinger
+name: Deploy to Hostinger via SSH
 
 on:
   push:
     branches:
-      - main # Sesuaikan dengan nama branch utama Anda (main/master)
+      - main
 
 jobs:
   web-deploy:
@@ -14,10 +14,10 @@ jobs:
       - name: 1. Mengambil kode terbaru
         uses: actions/checkout@v4
 
-      - name: 2. Setup PHP
+      - name: 2. Setup PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3" # Sesuaikan dengan versi PHP di Hostinger Anda
+          php-version: "8.3"
 
       - name: 3. Install Composer Dependencies
         run: composer install --no-dev --optimize-autoloader
@@ -32,16 +32,37 @@ jobs:
           npm install
           npm run build
 
-      - name: 6. Sinkronisasi FTP ke Hostinger
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 6. Deploy via SSH (Rsync)
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlgoDzvc -i --delete"
+          SOURCE: "./"
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          # PENTING: Sesuaikan 'domainanda.com' dengan nama domain asli Anda di Hostinger
+          TARGET: "/domains/https://lightgrey-cobra-541586.hostingersite.com//public_html/"
+          EXCLUDE: "/.git/, /node_modules/, /.env, /deploy_key*"
+
+      - name: 7. Menjalankan Perintah Artisan di Server Hostinger
+        uses: appleboy/ssh-action@master
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /public_html/ # Pastikan diakhiri dengan garis miring (/)
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env.example
-            README.md
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /domains/https://lightgrey-cobra-541586.hostingersite.com//public_html/
+
+            echo "--- Memulai Optimalisasi Laravel ---"
+
+            # Membersihkan seluruh cache lama
+            php7.4-cli artisan optimize:clear || php8.1-cli artisan optimize:clear || php8.2-cli artisan optimize:clear || php8.3-cli artisan optimize:clear || php artisan optimize:clear
+
+            echo "--- Menjalankan Migrasi Database ---"
+
+            # Jalankan migrasi dengan flag --force agar berjalan otomatis tanpa konfirmasi prompt y/n
+            php7.4-cli artisan migrate --force || php8.1-cli artisan migrate --force || php8.2-cli artisan migrate --force || php8.3-cli artisan migrate --force || php artisan migrate --force
+
+            echo "--- Optimalisasi Selesai! ---"
