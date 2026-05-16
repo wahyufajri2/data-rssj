@@ -42,7 +42,7 @@ jobs:
           REMOTE_PORT: ${{ secrets.SSH_PORT }}
           REMOTE_USER: ${{ secrets.SSH_USERNAME }}
           # PENTING: Sesuaikan 'domainanda.com' dengan nama domain asli Anda di Hostinger
-          TARGET: "/domains/https://lightgrey-cobra-541586.hostingersite.com//public_html/"
+          TARGET: "/home/u540774644/domains/lightgrey-cobra-541586.hostingersite.com//public_html/"
           EXCLUDE: "/.git/, /node_modules/, /.env, /deploy_key*"
 
       - name: 7. Menjalankan Perintah Artisan di Server Hostinger
@@ -53,7 +53,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /domains/https://lightgrey-cobra-541586.hostingersite.com//public_html/
+            cd /home/u540774644/domains/lightgrey-cobra-541586.hostingersite.com//public_html/
 
             echo "--- Memulai Optimalisasi Laravel ---"
 
