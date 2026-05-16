@@ -6,9 +6,15 @@ use App\Http\Controllers\Admin\PatientController;
 use App\Http\Controllers\Admin\ScreeningController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DukunganController;
+use App\Http\Controllers\Patient\BantuanController;
 use App\Http\Controllers\Patient\InitialScreeningController;
 use App\Http\Controllers\Patient\InterventionController;
-use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\Patient\RiwayatController;
+
+// Gunakan Alias (as) agar nama controller tidak bentrok
+use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
+use App\Http\Controllers\Patient\ProfilController as PatientProfilController;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -23,14 +29,14 @@ Route::get('/', function () {
         if ($user->hasRole('admin')) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->hasRole('patient')) {
-            return redirect()->route('pasien.dashboard');
+            return redirect()->route('pasien.skrining-awal');
         }
 
         // JIKA TIDAK PUNYA ROLE (Akun bermasalah / belum di-set rolenya)
         // Paksa keluar (logout) dan kembalikan ke halaman login dengan pesan error
         Auth::logout();
         return redirect()->route('login')->withErrors([
-            'no_hp' => 'Akun Anda tidak memiliki hak akses yang valid. Silakan hubungi admin.' // <-- UBAH DI SINI
+            'no_hp' => 'Akun Anda tidak memiliki hak akses yang valid. Silakan hubungi admin.'
         ]);
     }
 
@@ -59,14 +65,10 @@ Route::middleware('guest')->controller(AuthenticatedSessionController::class)->g
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    // Profil Umum
-    Route::get('/profil', [ProfilController::class, 'index'])->name('profile');
-    Route::put('/profil', [ProfilController::class, 'update'])->name('profile.update');
-    Route::put('/profil/password', [ProfilController::class, 'updatePassword'])->name('profile.password.update');
-
-    // Dukungan
+    // Dukungan (Fitur umum yang bisa diakses siapa saja yang sudah login)
     Route::get('/dukungan', [DukunganController::class, 'index'])->name('dukungan');
     Route::post('/dukungan/kirim', [DukunganController::class, 'send'])->name('dukungan.send');
+
 
     // ----------------- KHUSUS PASIEN -----------------
     Route::middleware(['role:patient'])->prefix('pasien')->name('pasien.')->group(function () {
@@ -85,7 +87,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/gad7/ringan', [InterventionController::class, 'gad7Ringan'])->name('gad7.ringan');
         Route::get('/gad7/sedang', [InterventionController::class, 'gad7Sedang'])->name('gad7.sedang');
         Route::get('/gad7/berat', [InterventionController::class, 'gad7Berat'])->name('gad7.berat');
+
+        // 3. Riwayat Skrining
+        Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
+
+        // 4. Bantuan
+        Route::get('/bantuan', [BantuanController::class, 'index'])->name('bantuan');
+
+        // 5. Profil Pasien (URL menjadi: /pasien/profil | Route name: pasien.profile)
+        Route::get('/profil', [PatientProfilController::class, 'index'])->name('profile');
+        Route::put('/profil', [PatientProfilController::class, 'update'])->name('profile.update');
+        Route::put('/profil/password', [PatientProfilController::class, 'updatePassword'])->name('profile.password.update');
     });
+
 
     // ----------------- KHUSUS ADMIN -----------------
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -104,5 +118,10 @@ Route::middleware('auth')->group(function () {
 
         // 4. Histori Skrining (URL: /admin/screenings)
         Route::get('/screenings', [ScreeningController::class, 'index'])->name('screenings');
+
+        // 5. Profil Admin (URL menjadi: /admin/profil | Route name: admin.profile)
+        Route::get('/profil', [AdminProfilController::class, 'index'])->name('profile');
+        Route::put('/profil', [AdminProfilController::class, 'update'])->name('profile.update');
+        Route::put('/profil/password', [AdminProfilController::class, 'updatePassword'])->name('profile.password.update');
     });
 });

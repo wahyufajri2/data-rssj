@@ -30,7 +30,7 @@
                     <img src="{{ asset('images/logo/logo.svg') }}" alt="Logo BKA Dark"
                         class="h-30 w-auto drop-shadow-md block dark:hidden" />
 
-                    <img src="{{ asset('images/logo/logo-dark.svg') }}" alt="Logo BKA Light"
+                    <img src="{{ asset('images/logo/logo.svg') }}" alt="Logo BKA Light"
                         class="h-30 w-auto drop-shadow-md hidden dark:block" />
                 </a>
                 <h1 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white sm:text-4xl tracking-tight">

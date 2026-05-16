@@ -86,7 +86,7 @@
                 class="dark:hidden" src="{{ asset('images/logo/logo.svg') }}" alt="Logo BKA" width="150"
                 height="40" />
             <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="hidden dark:block" src="{{ asset('images/logo/logo-dark.svg') }}" alt="Logo BKA" width="150"
+                class="hidden dark:block" src="{{ asset('images/logo/logo.svg') }}" alt="Logo BKA" width="150"
                 height="40" />
             <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
                 src="{{ asset('images/logo/logo-icon.svg') }}" alt="Logo BKA" width="32" height="32" />
