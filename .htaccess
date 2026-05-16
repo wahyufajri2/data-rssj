@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # 1. BLOKIR AKSES KE FILE SENSITIF (SANGAT PENTING!)
+    RewriteRule ^(\.git|\.env|composer\.json|composer\.lock|package\.json) - [F,L,NC]
+
+    # 2. ARAHKAN SEMUA TRAFFIC KE FOLDER PUBLIC
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ /public/$1 [L,QSA]
+
+</IfModule>
+
+# 3. KEAMANAN GANDA UNTUK .ENV
+
+<Files .env>
+Order allow,deny
+Deny from all
+</Files>
