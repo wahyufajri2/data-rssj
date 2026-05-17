@@ -241,7 +241,7 @@
                                 'bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 font-semibold shadow-sm' :
                                 'text-gray-500 hover:text-purple-600'"
                             class="flex-1 py-2 text-sm rounded-md transition-all">
-                            Suara Tenang
+                            Murottal Al-Qur'an
                         </button>
                     </div>
 

@@ -92,7 +92,7 @@
                 <div class="z-10 flex flex-col items-center justify-center px-10 text-center">
                     <a href="https://kemahasiswaan.unisayogya.ac.id/" target="_blank"
                         class="mb-6 block transition-transform hover:scale-105">
-                        <img src="{{ asset('images/logo/logo.svg') }}" alt="Logo BKA" class="h-30 w-auto" />
+                        <img src="{{ asset('images/logo/logo.svg?v=2') }}" alt="Logo BKA" class="h-30 w-auto" />
                     </a>
 
                     <div class="mb-6 rounded-full bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/20">

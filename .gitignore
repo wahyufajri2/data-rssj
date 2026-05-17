@@ -15,7 +15,10 @@
 /node_modules
 /public/build
 /public/hot
-/public/storage
+/public/storage/*
+!/public/storage/audio/
+!/public/storage/dukungan/
+!/public/storage/.gitignore
 /storage/*.key
 /storage/pail
 /vendor

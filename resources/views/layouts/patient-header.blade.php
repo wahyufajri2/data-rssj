@@ -30,16 +30,16 @@
 
         {{-- 2. Logo Desktop (Hanya muncul di md ke atas) --}}
         <a href="{{ route('pasien.skrining-awal') }}" class="hidden md:flex items-center gap-2">
-            <img class="h-10 dark:hidden" src="/images/logo/logo.svg" alt="Logo EMBRACE" />
-            <img class="h-10 hidden dark:block" src="/images/logo/logo.svg" alt="Logo EMBRACE" />
+            <img class="h-10 dark:hidden" src="/images/logo/logo.svg?v=2" alt="Logo EMBRACE" />
+            <img class="h-10 hidden dark:block" src="/images/logo/logo.svg?v=2" alt="Logo EMBRACE" />
         </a>
 
         {{-- ================= BAGIAN TENGAH ================= --}}
         {{-- 1. Logo Mobile (Berada pas di tengah) --}}
         <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:hidden">
             <a href="{{ route('pasien.skrining-awal') }}" class="flex items-center">
-                <img class="h-10 dark:hidden" src="/images/logo/logo.svg" alt="Logo EMBRACE" />
-                <img class="h-10 hidden dark:block" src="/images/logo/logo.svg" alt="Logo EMBRACE" />
+                <img class="h-10 dark:hidden" src="/images/logo/logo.svg?v=2" alt="Logo EMBRACE" />
+                <img class="h-10 hidden dark:block" src="/images/logo/logo.svg?v=2" alt="Logo EMBRACE" />
             </a>
         </div>
 
