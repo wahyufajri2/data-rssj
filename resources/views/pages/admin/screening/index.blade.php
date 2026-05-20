@@ -19,6 +19,76 @@
 
         <x-common.page-breadcrumb pageTitle="Histori Skrining" />
 
+        {{-- ================= BARISAN FILTER & EXPORT ACTIONS ================= --}}
+        <div
+            class="mb-6 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] shadow-theme-xs">
+            <form action="{{ route('admin.screenings') }}" method="GET" class="flex flex-col gap-4 lg:flex-row lg:items-end">
+
+                {{-- Filter 1: Nama / No HP Pasien --}}
+                <div class="flex-1">
+                    <label for="search"
+                        class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-400">
+                        Cari Pasien
+                    </label>
+                    <input type="text" id="search" name="search" value="{{ request('search') }}"
+                        placeholder="Nama pasien atau nomor HP..."
+                        class="w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 outline-hidden focus:border-brand-500 dark:border-gray-700 dark:text-white">
+                </div>
+
+                {{-- Filter 2: Tanggal Mulai --}}
+                <div class="w-full lg:w-48">
+                    <label for="start_date"
+                        class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-400">
+                        Tanggal Mulai
+                    </label>
+                    <input type="date" id="start_date" name="start_date" value="{{ request('start_date') }}"
+                        class="w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 outline-hidden focus:border-brand-500 dark:border-gray-700 dark:text-white">
+                </div>
+
+                {{-- Filter 3: Tanggal Selesai --}}
+                <div class="w-full lg:w-48">
+                    <label for="end_date"
+                        class="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-400">
+                        Tanggal Selesai
+                    </label>
+                    <input type="date" id="end_date" name="end_date" value="{{ request('end_date') }}"
+                        class="w-full rounded-xl border border-gray-200 bg-transparent px-4 py-2.5 text-sm text-gray-800 outline-hidden focus:border-brand-500 dark:border-gray-700 dark:text-white">
+                </div>
+
+                {{-- Grup Tombol Aksi --}}
+                <div class="flex w-full gap-3 lg:w-auto">
+                    {{-- Tombol Terapkan Filter --}}
+                    <button type="submit"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 lg:w-auto">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                        </svg>
+                        Filter
+                    </button>
+
+                    {{-- Tombol Reset Filter (Hanya muncul kalau ada filter aktif) --}}
+                    @if (request('search') || request('start_date') || request('end_date'))
+                        <a href="{{ route('admin.screenings') }}"
+                            class="flex items-center justify-center rounded-xl border border-gray-200 px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800">
+                            Reset
+                        </a>
+                    @endif
+
+                    {{-- Tombol Export Excel (Membawa query string filter saat ini) --}}
+                    <a href="{{ route('admin.screenings.export', request()->query()) }}"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-emerald-700 lg:w-auto">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export_Excel
+                    </a>
+                </div>
+            </form>
+        </div>
+        {{-- ================= END BARISAN FILTER ================= --}}
+
         <div
             class="rounded-2xl border border-gray-200 bg-white p-5 lg:p-6 dark:border-gray-800 dark:bg-white/[0.03] shadow-theme-xs">
 
@@ -133,7 +203,6 @@
                                             vas_category: '{{ ucfirst($screening->vas_category) }}',
                                             gad_score: '{{ $screening->gad_score ?? '-' }}',
                                             gad_category: '{{ ucfirst($screening->gad_category ?? 'Tidak Skrining') }}',
-                                            // Mengambil relasi jawaban (jika ada) dan mengubahnya ke JSON
                                             answers: {{ $screening->gadAnswers->count() > 0? json_encode($screening->gadAnswers->map(function ($ans) {return ['pertanyaan' => $ans->question->question ?? 'Pertanyaan dihapus', 'skor' => $ans->score];})): '[]' }}
                                         })"
                                         class="inline-flex items-center justify-center rounded-lg bg-brand-50 p-2 text-brand-500 transition-colors hover:bg-brand-100 hover:text-brand-700 dark:bg-brand-500/10 dark:hover:bg-brand-500/20"
@@ -161,15 +230,13 @@
             </div>
 
             <div class="mt-6">
-                {{ $screenings->links() }}
+                {{ $screenings->appends(request()->query())->links() }}
             </div>
         </div>
 
         {{-- ================= MODAL DETAIL SKRINING ================= --}}
-        <div x-show="isModalOpen" style="display: none;" class="relative z-50" aria-labelledby="modal-title" role="dialog"
-            aria-modal="true">
-
-            {{-- Background Backdrop --}}
+        <div x-show="isModalOpen" style="display: none;" class="relative z-50" aria-labelledby="modal-title"
+            role="dialog" aria-modal="true">
             <div x-show="isModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -177,8 +244,6 @@
 
             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-
-                    {{-- Modal Panel --}}
                     <div x-show="isModalOpen" @click.away="closeModal()" x-transition:enter="ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -187,12 +252,10 @@
                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
 
-                        {{-- Header Modal --}}
                         <div
                             class="border-b border-gray-100 px-6 py-4 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="modal-title">
-                                Detail Riwayat Skrining
-                            </h3>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="modal-title">Detail Riwayat
+                                Skrining</h3>
                             <button @click="closeModal()"
                                 class="text-gray-400 hover:text-gray-500 focus:outline-hidden dark:hover:text-gray-300">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -202,12 +265,9 @@
                             </button>
                         </div>
 
-                        {{-- Body Modal --}}
                         <div class="px-6 py-5">
                             <template x-if="selectedData">
                                 <div class="space-y-6">
-
-                                    {{-- Info Pasien & Waktu --}}
                                     <div class="grid grid-cols-2 gap-4 rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
                                         <div>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">Nama Pasien</p>
@@ -222,7 +282,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- Skor Ringkasan --}}
                                     <div class="grid grid-cols-2 gap-4">
                                         <div
                                             class="rounded-xl border border-gray-200 p-4 text-center dark:border-gray-700">
@@ -246,7 +305,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- Detail Jawaban GAD-7 (Muncul Jika Ada) --}}
                                     <div x-show="selectedData.answers && selectedData.answers.length > 0" class="mt-6">
                                         <h4 class="font-bold text-gray-800 dark:text-white mb-3 text-sm uppercase">Detail
                                             Jawaban GAD-7</h4>
@@ -273,18 +331,14 @@
                                             </table>
                                         </div>
                                     </div>
-
                                 </div>
                             </template>
                         </div>
 
-                        {{-- Footer Modal --}}
                         <div
                             class="bg-gray-50 px-6 py-4 dark:bg-gray-800/50 sm:flex sm:flex-row-reverse border-t border-gray-100 dark:border-gray-800">
                             <button type="button" @click="closeModal()"
-                                class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-theme-xs ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700">
-                                Tutup
-                            </button>
+                                class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-theme-xs ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700">Tutup</button>
                         </div>
                     </div>
                 </div>

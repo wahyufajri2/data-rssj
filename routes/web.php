@@ -118,6 +118,7 @@ Route::middleware('auth')->group(function () {
 
         // 4. Histori Skrining (URL: /admin/screenings)
         Route::get('/screenings', [ScreeningController::class, 'index'])->name('screenings');
+        Route::get('/screenings/export', [ScreeningController::class, 'export'])->name('screenings.export');
 
         // 5. Profil Admin (URL menjadi: /admin/profil | Route name: admin.profile)
         Route::get('/profil', [AdminProfilController::class, 'index'])->name('profile');
