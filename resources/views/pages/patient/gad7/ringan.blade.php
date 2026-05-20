@@ -20,6 +20,19 @@
     </style>
 
     <div class="p-4 mx-auto max-w-3xl md:p-6 lg:p-8">
+
+        {{-- Indikator Hasil Skrining GAD-7 --}}
+        <div class="mb-6 flex justify-center">
+            <div
+                class="inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-bold text-green-700 shadow-sm dark:border-green-800/30 dark:bg-green-900/20 dark:text-green-400 transition-colors">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Hasil Skrining GAD-7: Kecemasan Ringan
+            </div>
+        </div>
+
         <div class="mb-8 text-center">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Relaksasi Napas Dalam</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">Membantu mengurangi kecemasan, meningkatkan rasa tenang, dan

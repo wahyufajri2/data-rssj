@@ -20,8 +20,8 @@ class UserSeeder extends Seeder
             // 1. Akun Admin (Diambil dari data sebelumnya)
             [
                 'name'              => 'Admin Embrace', // Menggabungkan name dan fullname
-                'no_hp'             => '082134910932',
-                'email'             => 'embrace@unisayogya.ac.id',
+                'no_hp'             => '085747039355',
+                'email'             => 'nuzul.fr@unisayogya.ac.id',
                 'role'              => 'admin', // Menggunakan enum dari migration baru
                 'email_verified_at' => $now,
                 'password'          => Hash::make('password123'), // Password default admin

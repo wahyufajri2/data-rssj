@@ -2,6 +2,22 @@
 
 @section('content')
     <div class="p-4 mx-auto max-w-4xl md:p-6 lg:p-8">
+
+        {{-- Indikator Hasil Skrining GAD-7 (Berat) --}}
+        <div class="mb-6 flex justify-center">
+            <div
+                class="relative inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-bold text-red-700 shadow-sm dark:border-red-800/30 dark:bg-red-900/20 dark:text-red-400 transition-colors overflow-hidden">
+                <span class="absolute left-0 top-0 h-full w-1 bg-red-500 animate-pulse"></span>
+                <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+                Hasil Skrining GAD-7: Kecemasan Berat
+            </div>
+        </div>
+
         <div class="mb-8 text-center">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Kembali ke Saat Ini (Grounding)</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Teknik ini membantu membawa pikiran Anda
@@ -122,9 +138,7 @@
                     <div class="flex h-64 w-full items-center justify-center my-2 relative">
                         {{-- Animasi Lingkaran --}}
                         <div class="absolute rounded-full opacity-40 ease-in-out dark:opacity-30 h-24 w-24"
-                            :class="circleClass"
-                            :style="`transition-duration: ${animDuration}ms;`
-                            transition: 'all'">
+                            :class="circleClass" :style="`transition-duration: ${animDuration}ms; transition: all`">
                         </div>
                         {{-- Counter Tengah --}}
                         <div
@@ -274,10 +288,6 @@
                 class="inline-block rounded-xl bg-gray-100 px-10 py-4 text-sm font-bold text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 transition-colors shadow-sm">
                 Kembali ke Beranda
             </a>
-            {{-- <a href="#"
-                class="inline-block rounded-xl bg-red-600 px-10 py-4 text-sm font-bold text-white hover:bg-red-700 shadow-md transition-all transform hover:scale-105">
-                Hubungi Konselor
-            </a> --}}
         </div>
     </div>
 @endsection

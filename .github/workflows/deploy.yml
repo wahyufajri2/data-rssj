@@ -1,9 +1,12 @@
-name: Deploy to Hostinger via SSH
+name: Deploy to UNISA Server via SSH
 
 on:
   push:
     branches:
       - main
+
+env:
+  TARGET_DIR: "/var/www/embrace"
 
 jobs:
   web-deploy:
@@ -32,37 +35,28 @@ jobs:
           npm install
           npm run build
 
-      - name: 6. Deploy via SSH (Rsync)
-        uses: easingthemes/ssh-deploy@main
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ARGS: "-rlgoDzvc -i --delete"
-          SOURCE: "./"
-          REMOTE_HOST: ${{ secrets.SSH_HOST }}
-          REMOTE_PORT: ${{ secrets.SSH_PORT }}
-          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
-          # PENTING: Sesuaikan 'domainanda.com' dengan nama domain asli Anda di Hostinger
-          TARGET: "/home/u540774644/domains/lightgrey-cobra-541586.hostingersite.com//public_html/"
-          EXCLUDE: "/.git/, /node_modules/, /.env, /deploy_key*"
+      - name: 6. Deploy via SSH (Rsync dengan Password)
+        run: |
+          sudo apt-get update && sudo apt-get install -y sshpass
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -rlgoDzvc -i --delete \
+            -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
+            --exclude='/.git/' --exclude='/node_modules/' --exclude='/.env' \
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ env.TARGET_DIR }}/
 
-      - name: 7. Menjalankan Perintah Artisan di Server Hostinger
+      - name: 7. Menjalankan Perintah Artisan di Server UNISA
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd /home/u540774644/domains/lightgrey-cobra-541586.hostingersite.com//public_html/
+            cd ${{ env.TARGET_DIR }}
 
             echo "--- Memulai Optimalisasi Laravel ---"
-
-            # Membersihkan seluruh cache lama
-            php7.4-cli artisan optimize:clear || php8.1-cli artisan optimize:clear || php8.2-cli artisan optimize:clear || php8.3-cli artisan optimize:clear || php artisan optimize:clear
+            php artisan optimize:clear
 
             echo "--- Menjalankan Migrasi Database ---"
-
-            # Jalankan migrasi dengan flag --force agar berjalan otomatis tanpa konfirmasi prompt y/n
-            php7.4-cli artisan migrate --force || php8.1-cli artisan migrate --force || php8.2-cli artisan migrate --force || php8.3-cli artisan migrate --force || php artisan migrate --force
+            php artisan migrate --force
 
             echo "--- Optimalisasi Selesai! ---"

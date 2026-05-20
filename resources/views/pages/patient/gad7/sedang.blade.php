@@ -2,6 +2,20 @@
 
 @section('content')
     <div class="p-4 mx-auto max-w-4xl md:p-6 lg:p-8">
+
+        {{-- Indikator Hasil Skrining GAD-7 (Sedang) --}}
+        <div class="mb-6 flex justify-center">
+            <div
+                class="inline-flex items-center gap-2 rounded-full border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm font-bold text-yellow-700 shadow-sm dark:border-yellow-800/30 dark:bg-yellow-900/20 dark:text-yellow-400 transition-colors">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+                Hasil Skrining GAD-7: Kecemasan Sedang
+            </div>
+        </div>
+
         <div class="mb-8 text-center">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Intervensi Relaksasi Gabungan</h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">Mari bantu tubuh Anda melepas ketegangan yang menumpuk.</p>
