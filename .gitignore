@@ -15,10 +15,22 @@
 /node_modules
 /public/build
 /public/hot
+
+# --- PERBAIKAN STRUKTUR PUBLIC STORAGE ---
+# Izinkan Git masuk ke direktori induk public/storage
+!/public/storage/
+
+# Abaikan semua file di dalamnya...
 /public/storage/*
+
+# KECUALI folder-folder penting ini beserta seluruh isinya
 !/public/storage/audio/
+!/public/storage/audio/**
 !/public/storage/dukungan/
+!/public/storage/dukungan/**
 !/public/storage/.gitignore
+
+# --- MANAJEMEN STORAGE BAWAAN LARAVEL ---
 /storage/*.key
 /storage/pail
 /vendor

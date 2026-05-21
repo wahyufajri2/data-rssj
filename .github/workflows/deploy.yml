@@ -37,26 +37,25 @@ jobs:
 
       - name: 6. Deploy via SSH (Rsync dengan Password)
         run: |
-          sudo apt-get update && sudo apt-get install -y sshpass
           sshpass -p "${{ secrets.SSH_PASSWORD }}" rsync -rlgoDzvc -i --delete \
             -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no" \
             --exclude='/.git/' --exclude='/node_modules/' --exclude='/.env' \
             ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ env.TARGET_DIR }}/
 
-      - name: 7. Menjalankan Perintah Artisan di Server UNISA
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
+      - name: 7. Menjalankan Perintah Artisan di Server UNISA via SSH Inline
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd ${{ env.TARGET_DIR }}
 
+            echo "--- Membuat Ulang Tautan Pintasan Storage ---"
+            rm -f public/storage
+            php8.3 artisan storage:link
+
             echo "--- Memulai Optimalisasi Laravel ---"
-            php artisan optimize:clear
+            php8.3 artisan optimize:clear
 
             echo "--- Menjalankan Migrasi Database ---"
-            php artisan migrate --force
+            php8.3 artisan migrate --force
 
             echo "--- Optimalisasi Selesai! ---"
+          EOF
