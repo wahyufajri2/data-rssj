@@ -1,2 +1,10 @@
 *
 !.gitignore
+
+# Izinkan folder audio beserta seluruh isinya
+!audio/
+!audio/**
+
+# Izinkan folder dukungan beserta seluruh isinya
+!dukungan/
+!dukungan/**
