@@ -1,128 +1,68 @@
 <?php
 
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\GadQuestionController;
-use App\Http\Controllers\Admin\PatientController;
-use App\Http\Controllers\Admin\ScreeningController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\DukunganController;
-use App\Http\Controllers\Patient\BantuanController;
-use App\Http\Controllers\Patient\InitialScreeningController;
-use App\Http\Controllers\Patient\InterventionController;
-use App\Http\Controllers\Patient\RiwayatController;
-
-// Gunakan Alias (as) agar nama controller tidak bentrok
-use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
-use App\Http\Controllers\Patient\ProfilController as PatientProfilController;
-
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\PendataanController;
+use App\Http\Controllers\KuesionerMandiriController;
 
-// Rute Root (Cerdas)
+// Route root redirect ke dashboard
 Route::get('/', function () {
-    // Jika user sudah login
     if (Auth::check()) {
-        $user = Auth::user();
-
-        /** @var \App\Models\User $user */
-        // Arahkan ke dashboard masing-masing sesuai role
-        if ($user->hasRole('admin')) {
-            return redirect()->route('admin.dashboard');
-        } elseif ($user->hasRole('patient')) {
-            return redirect()->route('pasien.skrining-awal');
-        }
-
-        // JIKA TIDAK PUNYA ROLE (Akun bermasalah / belum di-set rolenya)
-        // Paksa keluar (logout) dan kembalikan ke halaman login dengan pesan error
-        Auth::logout();
-        return redirect()->route('login')->withErrors([
-            'no_hp' => 'Akun Anda tidak memiliki hak akses yang valid. Silakan hubungi admin.'
-        ]);
+        $rolePrefix = Auth::user()->role === 'admin_ranting' ? 'admin-ranting' : Auth::user()->role;
+        return redirect()->route('dashboard', ['role' => $rolePrefix]);
     }
-
-    // Jika belum login sama sekali, lempar ke halaman login
     return redirect()->route('login');
 });
 
-// ================= GUEST ROUTES (Belum Login) =================
-Route::middleware('guest')->controller(AuthenticatedSessionController::class)->group(function () {
-    // Login
-    Route::get('/login', 'create')->name('login');
-    Route::post('/login', 'store')->name('login.store');
+// Guest Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
-    // Registrasi Pasien (Menambahkan route ini untuk mengatasi error)
-    Route::get('/register', 'showRegisterForm')->name('register');
-    Route::post('/register', 'registerUser')->name('register.store');
-
-    // Lupa Password (Menggunakan alur OTP WhatsApp yang sebelumnya kita bahas)
-    Route::get('/forgot-password', 'showForgotForm')->name('password.request');
-    Route::post('/forgot-password', 'sendResetOtp')->name('password.email');
-    Route::get('/reset-password', 'showResetForm')->name('password.reset.form');
-    Route::post('/reset-password', 'resetPassword')->name('password.update');
+    // Register admin ranting route moved outside guest so Superadmin can access/verify it if needed,
+    // but typically accessed by unauthenticated users via shared WA link.
+    
+    // Password Reset
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'processForgotPassword'])->name('password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'processResetPassword'])->name('password.update');
 });
 
-// ================= AUTH ROUTES (Sudah Login) =================
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    // Dukungan (Fitur umum yang bisa diakses siapa saja yang sudah login)
-    Route::get('/dukungan', [DukunganController::class, 'index'])->name('dukungan');
-    Route::post('/dukungan/kirim', [DukunganController::class, 'send'])->name('dukungan.send');
+// Auth Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-    // ----------------- KHUSUS PASIEN -----------------
-    Route::middleware(['role:patient'])->prefix('pasien')->name('pasien.')->group(function () {
-
-        // 1. Dashboard Pasien (Cek Mood)
-        Route::get('/skrining-awal', [InitialScreeningController::class, 'index'])->name('skrining-awal');
-        Route::post('/mood-process', [InitialScreeningController::class, 'processMood'])->name('mood.process');
-
-        // 2. Rute Intervensi & GAD-7
-        Route::get('/intervensi-ringan', [InterventionController::class, 'ringan'])->name('intervensi.ringan');
-        Route::get('/intervensi-sedang', [InterventionController::class, 'sedang'])->name('intervensi.sedang');
-        Route::get('/gad7', [InterventionController::class, 'gad7Form'])->name('gad7.form');
-        Route::post('/gad7', [InterventionController::class, 'processGad7'])->name('gad7.process');
-
-        // Hasil Intervensi GAD-7
-        Route::get('/gad7/ringan', [InterventionController::class, 'gad7Ringan'])->name('gad7.ringan');
-        Route::get('/gad7/sedang', [InterventionController::class, 'gad7Sedang'])->name('gad7.sedang');
-        Route::get('/gad7/berat', [InterventionController::class, 'gad7Berat'])->name('gad7.berat');
-
-        // 3. Riwayat Skrining
-        Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat');
-
-        // 4. Bantuan
-        Route::get('/bantuan', [BantuanController::class, 'index'])->name('bantuan');
-
-        // 5. Profil Pasien (URL menjadi: /pasien/profil | Route name: pasien.profile)
-        Route::get('/profil', [PatientProfilController::class, 'index'])->name('profile');
-        Route::put('/profil', [PatientProfilController::class, 'update'])->name('profile.update');
-        Route::put('/profil/password', [PatientProfilController::class, 'updatePassword'])->name('profile.password.update');
+    // Register Admin Ranting (Hanya Superadmin)
+    Route::middleware(['role:superadmin'])->group(function () {
+        Route::get('/register-admin-ranting-secret', [AuthController::class, 'showSecretRegister'])->name('register.secret');
+        Route::post('/register-admin-ranting-secret', [AuthController::class, 'processSecretRegister'])->name('register.secret.submit');
     });
 
+    Route::middleware(['active_user', 'set_role_prefix'])->prefix('{role}')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-    // ----------------- KHUSUS ADMIN -----------------
-    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+        // Superadmin Routes
+        Route::middleware(['role:superadmin'])->group(function () {
+            Route::get('/users', [UserController::class, 'index'])->name('superadmin.users.index');
+            Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('superadmin.users.toggle');
+            
+            // Pengaturan Periode
+            Route::get('/periode', [\App\Http\Controllers\PeriodeController::class, 'index'])->name('superadmin.periode.index');
+            Route::post('/periode', [\App\Http\Controllers\PeriodeController::class, 'store'])->name('superadmin.periode.store');
+            Route::post('/periode/{periode}/toggle', [\App\Http\Controllers\PeriodeController::class, 'toggleActive'])->name('superadmin.periode.toggle');
+            Route::delete('/periode/{periode}', [\App\Http\Controllers\PeriodeController::class, 'destroy'])->name('superadmin.periode.destroy');
+        });
 
-        // 1. Dashboard Admin (URL: /admin/dashboard)
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        // Data Collection Routes (Accessible by both roles, controllers handle data filtering)
+        Route::resource('pendataan', \App\Http\Controllers\PendataanController::class);
+        Route::resource('kuesioner', \App\Http\Controllers\KuesionerMandiriController::class);
 
-        // 2. Data Pasien (URL: /admin/pasien)
-        Route::get('/data-pasien', [PatientController::class, 'index'])->name('pasien');
-
-        // 3. Pertanyaan GAD-7 (URL: /admin/gad-questions)
-        Route::get('/gad-questions', [GadQuestionController::class, 'index'])->name('gad-questions');
-        Route::post('/gad-questions', [GadQuestionController::class, 'store'])->name('gad-questions.store');
-        Route::put('/gad-questions/{id}', [GadQuestionController::class, 'update'])->name('gad-questions.update');
-        Route::patch('/gad-questions/{id}/toggle', [GadQuestionController::class, 'toggleStatus'])->name('gad-questions.toggle');
-
-        // 4. Histori Skrining (URL: /admin/screenings)
-        Route::get('/screenings', [ScreeningController::class, 'index'])->name('screenings');
-        Route::get('/screenings/export', [ScreeningController::class, 'export'])->name('screenings.export');
-
-        // 5. Profil Admin (URL menjadi: /admin/profil | Route name: admin.profile)
-        Route::get('/profil', [AdminProfilController::class, 'index'])->name('profile');
-        Route::put('/profil', [AdminProfilController::class, 'update'])->name('profile.update');
-        Route::put('/profil/password', [AdminProfilController::class, 'updatePassword'])->name('profile.password.update');
+        // Download Data Routes
+        Route::get('downloads', [\App\Http\Controllers\DownloadController::class, 'index'])->name('downloads.index');
+        Route::post('downloads/export', [\App\Http\Controllers\DownloadController::class, 'export'])->name('downloads.export');
     });
 });

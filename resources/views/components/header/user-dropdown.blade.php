@@ -45,15 +45,8 @@
 
         <ul class="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
             @php
-                // Menentukan Rute Profil berdasarkan Role Pengguna
-                // Ganti 'admin' atau 'patient' sesuai dengan nilai yang tersimpan di kolom role database Anda
-                $profileRoute = '#'; // Default aman
-
-                if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('super_admin')) {
-                    $profileRoute = route('admin.profile');
-                } elseif (Auth::user()->hasRole('patient') || Auth::user()->hasRole('pasien')) {
-                    $profileRoute = route('pasien.profile');
-                }
+                // Menentukan Rute Profil (Sementara menggunakan # karena belum ada halaman profil)
+                $profileRoute = '#'; 
 
                 $menuItems = [
                     [

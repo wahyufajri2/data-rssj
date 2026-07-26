@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? '-' }}</title>
+    <title>@hasSection('title')@yield('title') - @elseif(isset($title)){{ $title }} - @endif Sistem Ranting Sehat Siaga Jiwa</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo/leaf.svg') }}">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -109,6 +110,18 @@ window.addEventListener('resize', checkMobile);">
     {{-- preloader end --}}
 
     @yield('content')
+
+    <!-- Theme Toggle Button -->
+    <button @click="$store.theme.toggle()" class="fixed bottom-6 right-6 p-3 rounded-full bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white hover:scale-110 transition-transform duration-300 z-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        <!-- Sun icon (shows in dark mode) -->
+        <svg x-show="$store.theme.theme === 'dark'" x-cloak class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        <!-- Moon icon (shows in light mode) -->
+        <svg x-show="$store.theme.theme === 'light'" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+    </button>
 
     <x-ui.toast />
 

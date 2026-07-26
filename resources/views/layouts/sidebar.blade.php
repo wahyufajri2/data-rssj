@@ -4,7 +4,7 @@
 @endphp
 
 <aside id="sidebar"
-    class="fixed flex flex-col mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200"
+    class="fixed flex flex-col mt-0 top-0 px-5 left-0 text-gray-900 h-screen transition-all duration-300 ease-in-out z-99999 border-r border-gray-200 dark:border-gray-800"
     x-data="{
         openSubmenus: {},
     
@@ -76,6 +76,34 @@
     @mouseenter="if (!$store.sidebar.isExpanded) $store.sidebar.setHovered(true)"
     @mouseleave="$store.sidebar.setHovered(false)">
 
+    <!-- Background Gradient & Wave -->
+    <div class="absolute inset-0 z-[-1] bg-gradient-to-b from-green-50/50 to-white dark:from-green-900/20 dark:to-gray-900 overflow-hidden pointer-events-none transition-colors duration-300">
+        <!-- Top Left Leaf (Soft) -->
+        <div class="absolute top-0 left-0 w-48 h-48 opacity-30 dark:opacity-10">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full transform -translate-x-10 -translate-y-10">
+                <path d="M0,0 L200,0 C200,0 180,60 120,100 C60,140 0,200 0,200 L0,0 Z" fill="url(#sidebar-leaf-1)" />
+                <path d="M0,0 L150,0 C150,0 130,40 80,80 C30,120 0,150 0,150 L0,0 Z" fill="url(#sidebar-leaf-2)" />
+                <defs>
+                    <linearGradient id="sidebar-leaf-1" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#4ade80" stop-opacity="0.6"/>
+                        <stop offset="1" stop-color="#166534" stop-opacity="0.8"/>
+                    </linearGradient>
+                    <linearGradient id="sidebar-leaf-2" x1="0" y1="0" x2="150" y2="150" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#a3e635" stop-opacity="0.7"/>
+                        <stop offset="1" stop-color="#15803d" stop-opacity="0.9"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <!-- Bottom Right Leaf -->
+        <div class="absolute bottom-0 right-0 w-48 h-48 opacity-30 dark:opacity-10">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full transform translate-x-10 translate-y-10 rotate-180">
+                <path d="M0,0 L200,0 C200,0 180,60 120,100 C60,140 0,200 0,200 L0,0 Z" fill="url(#sidebar-leaf-1)" />
+                <path d="M0,0 L150,0 C150,0 130,40 80,80 C30,120 0,150 0,150 L0,0 Z" fill="url(#sidebar-leaf-2)" />
+            </svg>
+        </div>
+    </div>
+
     {{-- ... (Bagian Logo tetap sama) ... --}}
     <div class="pt-8 pb-7 flex"
         :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
@@ -83,13 +111,11 @@
         'justify-start'">
         <a href="/">
             <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="dark:hidden" src="{{ asset('images/logo/logo.svg?v=2') }}" alt="Logo BKA" width="150"
-                height="40" />
+                class="dark:hidden" src="{{ asset('images/logo/leaf-text.svg') }}" alt="Logo RSSJ" width="140" height="35" />
             <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="hidden dark:block" src="{{ asset('images/logo/logo.svg?v=2') }}" alt="Logo BKA" width="150"
-                height="40" />
+                class="hidden dark:block" src="{{ asset('images/logo/leaf-text.svg') }}" alt="Logo RSSJ" width="140" height="35" />
             <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
-                src="{{ asset('images/logo/logo-icon.svg') }}" alt="Logo BKA" width="32" height="32" />
+                src="{{ asset('images/logo/leaf.svg') }}" alt="Logo RSSJ" width="32" height="32" />
         </a>
     </div>
 

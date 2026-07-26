@@ -1,12 +1,33 @@
 <header
-    class="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 xl:border-b"
+    class="sticky top-0 flex w-full border-gray-200 z-99999 dark:border-gray-800 xl:border-b relative"
     x-data="{
         isApplicationMenuOpen: false,
         toggleApplicationMenu() {
             this.isApplicationMenuOpen = !this.isApplicationMenuOpen;
         }
     }">
-    <div class="flex flex-col items-center justify-between grow xl:flex-row xl:px-6">
+    <!-- Background Gradient & Wave -->
+    <div class="absolute inset-0 z-0 bg-gradient-to-r from-white to-green-50/50 dark:from-gray-900 dark:to-green-900/20 pointer-events-none transition-colors duration-300 overflow-hidden">
+        <!-- Right side Leaf/Wave -->
+        <div class="absolute top-0 right-0 w-32 h-32 opacity-30 dark:opacity-10">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full transform translate-x-4 -translate-y-16 rotate-[70deg]">
+                <path d="M0,0 L200,0 C200,0 180,60 120,100 C60,140 0,200 0,200 L0,0 Z" fill="url(#header-leaf-1)" />
+                <path d="M0,0 L150,0 C150,0 130,40 80,80 C30,120 0,150 0,150 L0,0 Z" fill="url(#header-leaf-2)" />
+                <defs>
+                    <linearGradient id="header-leaf-1" x1="0" y1="0" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#4ade80" stop-opacity="0.6"/>
+                        <stop offset="1" stop-color="#166534" stop-opacity="0.8"/>
+                    </linearGradient>
+                    <linearGradient id="header-leaf-2" x1="0" y1="0" x2="150" y2="150" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#a3e635" stop-opacity="0.7"/>
+                        <stop offset="1" stop-color="#15803d" stop-opacity="0.9"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+    </div>
+
+    <div class="flex flex-col items-center justify-between grow xl:flex-row xl:px-6 relative z-10">
         <div
             class="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 xl:justify-normal xl:border-b-0 xl:px-0 lg:py-4">
 
@@ -50,8 +71,8 @@
 
             <!-- Logo (mobile only) -->
             <a href="/" class="xl:hidden">
-                <img class="dark:hidden" src="/images/logo/logo.svg?v=2" alt="Logo" />
-                <img class="hidden dark:block" src="/images/logo/logo.svg?v=2" alt="Logo" />
+                <img class="dark:hidden h-8" src="/images/logo/leaf-text.svg" alt="Logo RSSJ" />
+                <img class="hidden dark:block h-8" src="/images/logo/leaf-text.svg" alt="Logo RSSJ" />
             </a>
 
             <!-- Application Menu Toggle (mobile only) -->

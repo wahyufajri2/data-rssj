@@ -13,9 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectUsersTo('/');
+        
         $middleware->alias([
             'auth' => Authenticate::class,
-            'role' => CheckRole::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'active_user' => \App\Http\Middleware\ActiveUserMiddleware::class,
+            'set_role_prefix' => \App\Http\Middleware\SetRolePrefix::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

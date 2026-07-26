@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? '-' }}</title>
+    <title>@hasSection('title')@yield('title') - @elseif(isset($title)){{ $title }} - @endif Sistem Ranting Sehat Siaga Jiwa</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo/leaf.svg') }}">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -36,10 +37,10 @@
                     const body = document.body;
                     if (this.theme === 'dark') {
                         html.classList.add('dark');
-                        body.classList.add('dark', 'bg-gray-900');
+                        body.classList.add('dark');
                     } else {
                         html.classList.remove('dark');
-                        body.classList.remove('dark', 'bg-gray-900');
+                        body.classList.remove('dark');
                     }
                 }
             });
@@ -83,10 +84,10 @@
             const theme = savedTheme || systemTheme;
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
-                document.body.classList.add('dark', 'bg-gray-900');
+                document.body.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
-                document.body.classList.remove('dark', 'bg-gray-900');
+                document.body.classList.remove('dark');
             }
         })();
     </script>
@@ -95,12 +96,35 @@
         [x-cloak] {
             display: none !important;
         }
+
+        /* Bubble Animations */
+        @keyframes float-slow {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        @keyframes float-medium {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-40px, -30px) scale(0.95); }
+            66% { transform: translate(40px, -20px) scale(1.05); }
+        }
+
+        @keyframes float-fast {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -40px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
+        .animate-float-slow { animation: float-slow 18s ease-in-out infinite; }
+        .animate-float-medium { animation: float-medium 14s ease-in-out infinite; }
+        .animate-float-fast { animation: float-fast 10s ease-in-out infinite; }
     </style>
 
 
 </head>
 
-<body x-data="{ 'loaded': true }" x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300" x-data="{ 'loaded': true }" x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
 const checkMobile = () => {
     if (window.innerWidth < 1280) {
         $store.sidebar.setMobileOpen(false);

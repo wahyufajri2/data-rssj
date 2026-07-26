@@ -2,56 +2,49 @@
 
 namespace Database\Seeders;
 
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\Ranting;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $now = Carbon::now();
-
-        $users = [
-            // 1. Akun Admin (Diambil dari data sebelumnya)
+        // 1. Buat Superadmin
+        User::firstOrCreate(
+            ['email' => 'superadmin@rssj.com'],
             [
-                'name'              => 'Admin Embrace', // Menggabungkan name dan fullname
-                'no_hp'             => '085747039355',
-                'email'             => 'nuzul.fr@unisayogya.ac.id',
-                'role'              => 'admin', // Menggunakan enum dari migration baru
-                'email_verified_at' => $now,
-                'password'          => Hash::make('password123'), // Password default admin
-                'remember_token'    => null,
-                'created_at'        => $now,
-                'updated_at'        => $now,
-            ],
-            // 2. Akun Pasien Contoh
-            [
-                'name'              => 'Pasien Contoh',
-                'no_hp'             => '081234567890',
-                'email'             => 'pasien@example.com', // Bisa diisi null karena di migration diset nullable()
-                'role'              => 'patient',
-                'email_verified_at' => $now,
-                'password'          => Hash::make('password123'), // Password default pasien
-                'remember_token'    => null,
-                'created_at'        => $now,
-                'updated_at'        => $now,
-            ],
-        ];
+                'name' => 'Superadmin RSSJ',
+                'password' => Hash::make('password123'),
+                'role' => 'superadmin',
+                'is_active' => true,
+            ]
+        );
 
-        // Menggunakan 'no_hp' sebagai parameter unik (kunci) untuk upsert,
-        // karena no_hp sekarang digunakan sebagai username mutlak saat login.
-        DB::table('users')->upsert($users, ['no_hp'], [
-            'name',
-            'email',
-            'role',
-            'password',
-            'email_verified_at',
-            'updated_at'
-        ]);
+        // 2. Buat Admin Ranting (Ngadisuryan)
+        // Cari Ranting Ngadisuryan, jika belum ada kita buatkan data dummy-nya
+        $ranting = Ranting::where('nama_ranting', 'LIKE', '%Ngadisuryan%')->first();
+        
+        if (!$ranting) {
+            $ranting = Ranting::firstOrCreate(
+                ['nama_ranting' => 'Ngadisuryan'],
+                [
+                    'cabang_id' => 1, // Fallback ke cabang ID 1
+                    'no_sk' => 'SK-NGADISURYAN-2026'
+                ]
+            );
+        }
+
+        User::firstOrCreate(
+            ['email' => 'admin.ngadisuryan@rssj.com'],
+            [
+                'name' => 'Admin Ranting Ngadisuryan',
+                'password' => Hash::make('password123'),
+                'role' => 'admin_ranting',
+                'ranting_id' => $ranting->id,
+                'is_active' => true,
+            ]
+        );
     }
 }
