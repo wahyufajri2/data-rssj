@@ -1,24 +1,55 @@
-# EMBRACE - Aplikasi Skrining Kesehatan Mental & Kecemasan
+# 🌿 Sistem Deteksi Keluarga: Ranting Siaga Sehat Jiwa
+**Platform Pendataan Kesehatan Mental dan Psikososial Warga 'Aisyiyah se-Daerah Istimewa Yogyakarta**
 
-**EMBRACE** adalah platform berbasis web inovatif yang ditenagai oleh **Laravel 12**, **Tailwind CSS v4**, dan **Alpine.js**, dirancang khusus untuk mendeteksi dini dan mengelola tingkat kecemasan pengguna. Lebih dari sekadar aplikasi medis, EMBRACE menghadirkan ruang aman digital dengan antarmuka yang sangat menenangkan, interaktif, dan tidak mengintimidasi. Aplikasi ini menggabungkan pelacakan *mood* harian dengan kuesioner klinis terstandarisasi (GAD-7) ke dalam pengalaman pengguna (*User Experience*) modern.
+---
 
-Dirancang untuk kecepatan, keamanan, dan skalabilitas, EMBRACE adalah solusi sempurna bagi institusi maupun individu yang membutuhkan *dashboard* pemantauan kesehatan mental yang akurat, dengan visual yang memukau seperti efek *Aurora UI* dan *Glassmorphism*.
+## 🚀 Mengapa Sistem Ini Hadir?
 
-## ✨ Key Features
+Kesehatan jiwa adalah pilar utama kesejahteraan keluarga. **Sistem Deteksi Keluarga** hadir sebagai solusi digital terintegrasi untuk memetakan, mendeteksi, dan menganalisis status kesehatan mental serta risiko psikososial jutaan warga di tingkat Ranting secara *real-time*. 
 
-* 🚀 **Laravel 12 Core** - Dibangun dengan versi Laravel terbaru, menjamin keamanan tingkat tinggi, *routing* yang dioptimalkan, dan arsitektur basis data yang kokoh.
-* 🎨 **Tailwind CSS v4** - *Styling* kelas utilitas untuk pengembangan UI yang cepat dan responsif, termasuk efek *Glassmorphism* yang elegan.
-* ⚡ **Alpine.js Interactivity** - Interaktivitas *frontend* yang sangat ringan (modal, *dropdown*, animasi *state*) tanpa membebani performa aplikasi.
-* 🌌 **Aurora UI & Particle Animations** - Antarmuka futuristik dan menenangkan dengan elemen bercahaya berdenyut (*glowing blobs*) dan animasi partikel (bunga berjatuhan) pada halaman skrining untuk meredakan ketegangan pengguna.
-* 📱 **Fully Responsive Layouts** - Desain *mobile-first* yang mulus, memastikan pengalaman yang sama nyamannya saat diakses melalui *smartphone* maupun desktop.
-* 🌙 **Built-in Dark Mode** - Transisi sempurna ke tema gelap (*Dark Mode*) dengan penyesuaian kontras yang presisi untuk kenyamanan mata.
-* 🩺 **Clinical Integration (GAD-7)** - Kuesioner medis terstandarisasi (GAD-7) terintegrasi dengan logika *backend* untuk menentukan tingkat kecemasan secara otomatis (Ringan, Sedang, Berat).
-* 📊 **Advanced Admin Dashboard** - Panel admin komprehensif untuk memantau data pasien, analitik *mood* global, riwayat skrining, dan manajemen pertanyaan kuesioner yang dinamis.
+Dirancang khusus untuk menangani skala data masif (hingga 3 juta+ data warga) dengan antarmuka yang sangat responsif, sistem ini memberdayakan para kader dan pengurus 'Aisyiyah untuk mengambil keputusan berbasis data (*data-driven*) dengan cepat, tepat, dan akurat.
 
-### Pengalaman Skrining yang Humanis
+---
 
-Berbeda dengan form kuesioner kaku pada umumnya, EMBRACE merombak cara pengguna melaporkan kesehatan mentalnya. Halaman skrining awal disajikan dalam satu layar penuh (*fullscreen*) tanpa *scrollbar*, menampilkan sapaan personal, visualisasi emoji yang responsif, dan animasi latar belakang yang merespons secara visual—menciptakan suasana layaknya sedang bercerita kepada sahabat yang empatik.
+## ✨ Fitur Unggulan
 
-### Manajemen Data Terpusat dan Aman
+### 📊 1. Dashboard Analitik Cerdas
+Tidak ada lagi data yang berserakan. Dashboard menyajikan ringkasan visual yang indah dan mudah dipahami:
+- **Statistik Komprehensif:** Menampilkan total warga yang terdata dengan metrik yang jelas.
+- **Grafik Tren Kesehatan (Line Chart):** Visualisasi interaktif per tahun yang memetakan pergerakan status kesehatan warga: *Mengalami Gangguan Jiwa*, *Risiko Masalah Psikososial*, dan *Sehat*.
+- **Performa Responsif:** Mampu merender agregasi jutaan data dalam hitungan milidetik.
 
-Di balik antarmukanya yang indah, EMBRACE menyimpan arsitektur *backend* yang tangguh. Sistem *Role-Based Access Control* (RBAC) memisahkan jalur data pasien dengan ketat dari panel Admin/Verifikator. Semua informasi pribadi, riwayat skrining, dan hasil analisis GAD-7 disimpan dan dilindungi menggunakan standar keamanan industri, menjadikannya platform yang andal dan siap untuk *deployment* skala produksi.
+### 📝 2. Pendataan Ranting Siaga Sehat Jiwa (Auto-Diagnosis)
+Proses input data yang dirancang sangat intuitif bagi kader di lapangan, mencakup data demografi lengkap (Kepala Keluarga, Umur, Status, Pendidikan, Pekerjaan, Alamat).
+- **Logika Deteksi Otomatis:** Sistem secara pintar akan menentukan status akhir kesehatan warga berdasarkan input gejala. 
+  - *Sistem memprioritaskan indikasi Gangguan Jiwa (seperti sedih berkepanjangan, menyendiri). Jika tidak terpenuhi, sistem akan mengevaluasi Risiko Psikososial (seperti kehilangan pekerjaan, penyakit kronis).*
+- **Satu Pintu:** Semua indikator disatukan dalam satu antarmuka formulir yang cantik dan tidak membingungkan.
+
+### 🧠 3. Kuesioner Laporan Mandiri (SRQ-20)
+Modul khusus untuk asesmen mandiri yang lebih mendalam:
+- **Formulir Gejala (20 Pertanyaan):** Mengadaptasi standar kuisioner kesehatan mental untuk mendeteksi tingkat stres, kecemasan, dan depresi.
+- **Tracking Kebiasaan Hidup (30 Hari Terakhir):** Melacak gaya hidup warga mulai dari rutinitas olahraga, durasi tidur, konsumsi air putih, hingga rutinitas ibadah (mengaji & membaca Al-Qur'an).
+
+### 🔒 4. Manajemen Akses Berlapis & Aman (Superadmin & Admin Ranting)
+Sistem ini menggunakan arsitektur keamanan *Role-Based Access Control* (RBAC) yang terisolasi:
+- **Admin Ranting (Mandiri & Terfokus):** Admin ranting mendaftar melalui jalur khusus dan hanya memiliki wewenang mengelola data di wilayah rantingnya sendiri. Memastikan privasi data antar wilayah tetap terjaga.
+- **Superadmin (God-Mode):** Memiliki kontrol penuh atas seluruh sistem. Dilengkapi dengan fitur **Approval Akun Admin Ranting** untuk mencegah akses dari pihak yang tidak bertanggung jawab.
+
+### ⚙️ 5. Pengaturan Dinamis & Ekspor Data
+Sistem tidak akan lekang oleh waktu karena dirancang sangat dinamis:
+- **Manajemen Periode (Per Tahun):** Superadmin dapat membuka atau menutup periode pendataan setiap tahunnya, memastikan data historis tersimpan rapi tanpa tercampur.
+- **Manajemen Pengguna:** Pengelolaan belasan ribu akun admin wilayah dengan fitur pencarian dan filter yang sangat cepat.
+- **Unduh Data (Export):** Ekstrak hasil pendataan kapan saja untuk kebutuhan laporan cetak, audit, atau analisis lanjutan.
+
+---
+
+## 🛠️ Teknologi di Balik Layar
+
+Sistem ini ditenagai oleh kombinasi arsitektur modern yang menjamin kecepatan dan keandalan tinggi:
+*   **Laravel 12:** Sebagai *backend engine* yang sangat tangguh untuk memproses *business logic* dan keamanan tingkat tinggi.
+*   **Alpine.js:** Memberikan reaktivitas antarmuka (*client-side*) selembut aplikasi *Single Page Application* tanpa membebani performa *browser*.
+*   **Tailwind CSS:** Menghasilkan desain antarmuka (UI) yang modern, bersih, dan responsif di berbagai ukuran layar.
+*   **Optimasi MySQL Skala Besar:** Skema *database* telah dioptimasi dengan teknik *Composite Indexing* dan *Cursor Pagination* untuk menjamin sistem tidak melambat meski menampung jutaan baris data.
+
+---
+*Dikembangkan secara dedikatif untuk mewujudkan keluarga dan masyarakat yang sehat secara fisik, mental, dan spiritual.*
