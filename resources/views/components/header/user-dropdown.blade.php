@@ -45,8 +45,8 @@
 
         <ul class="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
             @php
-                // Menentukan Rute Profil (Sementara menggunakan # karena belum ada halaman profil)
-                $profileRoute = '#'; 
+                // Menentukan Rute Profil
+                $profileRoute = route('profile.edit', ['role' => Auth::user()->role === 'admin_ranting' ? 'admin-ranting' : Auth::user()->role]); 
 
                 $menuItems = [
                     [

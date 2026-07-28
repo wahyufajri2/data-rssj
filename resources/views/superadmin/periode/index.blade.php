@@ -58,18 +58,44 @@
                         <td class="px-6 py-4 text-sm font-medium text-center flex justify-center gap-2">
                             @if(!$periode->is_active)
                                 <!-- Form Aktifkan -->
-                                <form action="{{ route('superadmin.periode.toggle', $periode->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin MENGAKTIFKAN periode ini? Periode lain akan otomatis dinonaktifkan.');">
+                                <form action="{{ route('superadmin.periode.toggle', $periode->id) }}" method="POST" class="inline-block" x-data @submit.prevent="Swal.fire({
+                                    title: 'Aktifkan Periode?',
+                                    text: 'Apakah Anda yakin ingin MENGAKTIFKAN periode ini? Periode lain akan otomatis dinonaktifkan.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#22c55e',
+                                    cancelButtonColor: '#6b7280',
+                                    confirmButtonText: 'Ya, Aktifkan!',
+                                    cancelButtonText: 'Batal',
+                                    background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                                    color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827'
+                                }).then((result) => {
+                                    if (result.isConfirmed) $el.submit();
+                                })">
                                     @csrf
-                                    <button type="submit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded text-xs font-semibold">
+                                    <button type="submit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded text-xs font-semibold cursor-pointer">
                                         Aktifkan
                                     </button>
                                 </form>
 
                                 <!-- Form Hapus -->
-                                <form action="{{ route('superadmin.periode.destroy', $periode->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin MENGHAPUS periode {{ $periode->tahun }}?');">
+                                <form action="{{ route('superadmin.periode.destroy', $periode->id) }}" method="POST" class="inline-block" x-data @submit.prevent="Swal.fire({
+                                    title: 'Hapus Periode?',
+                                    text: 'Apakah Anda yakin ingin MENGHAPUS periode {{ $periode->tahun }}?',
+                                    icon: 'error',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#ef4444',
+                                    cancelButtonColor: '#6b7280',
+                                    confirmButtonText: 'Ya, Hapus!',
+                                    cancelButtonText: 'Batal',
+                                    background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+                                    color: document.documentElement.classList.contains('dark') ? '#f3f4f6' : '#111827'
+                                }).then((result) => {
+                                    if (result.isConfirmed) $el.submit();
+                                })">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded text-xs font-semibold ml-2">
+                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded text-xs font-semibold ml-2 cursor-pointer">
                                         Hapus
                                     </button>
                                 </form>

@@ -10,7 +10,7 @@ class PeriodeController extends Controller
 {
     public function index()
     {
-        $periodes = Periode::orderBy('tahun', 'desc')->get();
+        $periodes = Periode::orderBy('tahun', 'asc')->get();
         return view('superadmin.periode.index', compact('periodes'));
     }
 

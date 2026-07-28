@@ -17,18 +17,21 @@ class DownloadController extends Controller
         if (Auth::user()->role === 'superadmin') {
             $rantings = Ranting::all();
         }
+        $periodes = \App\Models\Periode::orderBy('tahun', 'desc')->get();
 
-        return view('downloads.index', compact('rantings'));
+        return view('downloads.index', compact('rantings', 'periodes'));
     }
 
     public function export(Request $request)
     {
         $request->validate([
             'jenis_data' => 'required|in:pendataan,kuesioner,semua',
-            'ranting_id' => 'nullable|exists:rantings,id'
+            'ranting_id' => 'nullable|exists:rantings,id',
+            'periode_id' => 'nullable|exists:periodes,id'
         ]);
 
         $jenisData = $request->jenis_data;
+        $periodeId = $request->periode_id;
         
         // Admin Ranting hanya bisa download data rantingnya sendiri
         $rantingId = Auth::user()->role === 'admin_ranting' ? Auth::user()->ranting_id : $request->ranting_id;
@@ -44,13 +47,13 @@ class DownloadController extends Controller
 
         if ($jenisData === 'pendataan') {
             $fileName = "Data_Pendataan_RSSJ_{$rantingName}_{$timestamp}.xlsx";
-            return (new PendataanExport($rantingId))->download($fileName);
+            return (new PendataanExport($rantingId, $periodeId))->download($fileName);
         } elseif ($jenisData === 'kuesioner') {
             $fileName = "Data_Kuesioner_{$rantingName}_{$timestamp}.xlsx";
-            return (new KuesionerExport($rantingId))->download($fileName);
+            return (new KuesionerExport($rantingId, $periodeId))->download($fileName);
         } else {
             $fileName = "Data_Lengkap_RSSJ_{$rantingName}_{$timestamp}.xlsx";
-            return (new GabunganExport($rantingId))->download($fileName);
+            return (new GabunganExport($rantingId, $periodeId))->download($fileName);
         }
     }
 }

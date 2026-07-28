@@ -37,7 +37,7 @@ class MenuHelper
     {
         return [
             [
-                'title' => 'Menu Utama',
+                'title' => 'Superadmin',
                 'items' => [
                     [
                         'name' => 'Dashboard',
@@ -88,7 +88,7 @@ class MenuHelper
     {
         return [
             [
-                'title' => 'Menu Utama',
+                'title' => 'Admin Ranting',
                 'items' => [
                     [
                         'name' => 'Dashboard',

@@ -63,8 +63,7 @@
                     @if(Auth::user()->isSuperadmin())
                     <div class="mb-6 p-4 rounded-xl border border-indigo-100 bg-indigo-50/30 dark:bg-indigo-900/10 dark:border-indigo-800/30">
                         <label class="block text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-2">Pilih Ranting Tujuan (Khusus Superadmin) <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <select name="ranting_id" required class="appearance-none block w-full rounded-lg border-indigo-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white py-3 px-4">
+                            <select id="ranting-select" name="ranting_id" required class="block w-full rounded-lg border-indigo-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white py-3 px-4">
                                 <option value="">-- Silakan Pilih Cabang / Ranting --</option>
                                 @foreach($rantings as $ranting)
                                     <option value="{{ $ranting->id }}" {{ old('ranting_id') == $ranting->id ? 'selected' : '' }}>
@@ -72,10 +71,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-indigo-500">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
                     </div>
                     @endif
 
@@ -256,3 +251,62 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<!-- Tambahkan CDN TomSelect -->
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('ranting-select')) {
+            new TomSelect("#ranting-select", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: "-- Silakan Pilih Cabang / Ranting --"
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Styling TomSelect to match Tailwind */
+    .ts-wrapper .ts-control {
+        border-radius: 0.5rem;
+        border-color: #e5e7eb;
+        padding: 0.75rem 1rem;
+        background-color: #f9fafb;
+        color: #374151;
+    }
+    .ts-wrapper .ts-control > input {
+        color: #374151;
+    }
+    .dark .ts-wrapper .ts-control,
+    .dark .ts-wrapper.single.input-active .ts-control {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #f3f4f6 !important;
+    }
+    .dark .ts-wrapper .ts-control > input {
+        color: #f3f4f6 !important;
+    }
+    .dark .ts-dropdown {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #f3f4f6 !important;
+    }
+    .dark .ts-dropdown .option {
+        color: #f3f4f6 !important;
+    }
+    .dark .ts-dropdown .option.active, 
+    .dark .ts-dropdown .option:hover {
+        background-color: #4b5563 !important;
+        color: #fff !important;
+    }
+    .ts-wrapper.single .ts-control:after {
+        border-color: #9ca3af transparent transparent transparent !important;
+    }
+</style>
+@endpush

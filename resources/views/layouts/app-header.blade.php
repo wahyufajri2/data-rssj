@@ -69,15 +69,41 @@
                 </svg>
             </button>
 
-            <!-- Logo (mobile only) -->
-            <a href="/" class="xl:hidden">
-                <img class="dark:hidden h-8" src="/images/logo/leaf-text.svg" alt="Logo RSSJ" />
-                <img class="hidden dark:block h-8" src="/images/logo/leaf-text.svg" alt="Logo RSSJ" />
-            </a>
+            <!-- Mobile Logo & Period Badge Group -->
+            <div class="flex items-center justify-center gap-2 sm:gap-4 xl:ml-4 flex-1 xl:flex-none">
+                <!-- Logo (mobile only) -->
+                <a href="/" class="xl:hidden shrink-0">
+                    <img class="dark:hidden h-7 sm:h-8" src="/images/logo/leaf-text.svg" alt="Logo RSSJ" />
+                    <img class="hidden dark:block h-7 sm:h-8" src="/images/logo/leaf-text.svg" alt="Logo RSSJ" />
+                </a>
+
+                <!-- Periode Aktif Badge -->
+                @php
+                    $activePeriode = \App\Models\Periode::where('is_active', true)->first();
+                @endphp
+                @if($activePeriode)
+                <div class="inline-flex items-center px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 shadow-sm transition-all hover:shadow-md shrink-0">
+                    <span class="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5 mr-1.5 sm:mr-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[11px] sm:text-sm font-bold text-emerald-800 dark:text-emerald-300 tracking-wide">
+                        <span class="hidden sm:inline">Periode Aktif </span><span class="sm:hidden">Thn </span>{{ $activePeriode->tahun }}
+                    </span>
+                </div>
+                @else
+                <div class="inline-flex items-center px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 shadow-sm shrink-0">
+                    <span class="flex h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 mr-1.5 sm:mr-2.5"></span>
+                    <span class="text-[11px] sm:text-sm font-bold text-red-800 dark:text-red-300 tracking-wide">
+                        <span class="hidden sm:inline">Tidak Ada Periode Aktif</span><span class="sm:hidden">Periode Kosong</span>
+                    </span>
+                </div>
+                @endif
+            </div>
 
             <!-- Application Menu Toggle (mobile only) -->
             <button @click="toggleApplicationMenu()"
-                class="flex items-center justify-center w-10 h-10 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 xl:hidden">
+                class="flex items-center justify-center w-10 h-10 shrink-0 text-gray-700 rounded-lg z-99999 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 xl:hidden">
                 <!-- Dots Icon -->
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -85,38 +111,6 @@
                         fill="currentColor" />
                 </svg>
             </button>
-
-            <!-- Search Bar (desktop only) -->
-            {{-- <div class="hidden xl:block">
-                <form>
-                    <div class="relative">
-                        <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
-                            <!-- Search Icon -->
-                            <svg class="fill-gray-500 dark:fill-gray-400" width="20" height="20"
-                                viewBox="0 0 20 20" fill="none">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
-                                    fill="" />
-                            </svg>
-                        </span>
-                        <input type="text" placeholder="Cari atau ketik perintah..."
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]" />
-                        <button
-                            class="absolute right-2.5 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-[7px] py-[4.5px] text-xs -tracking-[0.2px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
-                            <span> ⌘ </span>
-                            <span> K </span>
-                        </button>
-                    </div>
-                </form>
-            </div> --}}
-            {{-- <div class="hidden xl:block">
-                <p class="text-xl font-medium text-gray-600 dark:text-gray-400">
-                    Periode Aktif:
-                    <span class="font-semibold text-brand-500 dark:text-brand-400">
-                        {{ $currentPeriod ?? 'Tidak ada periode aktif' }}
-                    </span>
-                </p>
-            </div> --}}
         </div>
 
         <!-- Application Menu (mobile) and Right Side Actions (desktop) -->

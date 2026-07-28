@@ -18,10 +18,12 @@ class KuesionerExport implements FromQuery, WithHeadings, WithMapping, WithStyle
     use Exportable;
 
     protected $ranting_id;
+    protected $periode_id;
 
-    public function __construct($ranting_id = null)
+    public function __construct($ranting_id = null, $periode_id = null)
     {
         $this->ranting_id = $ranting_id;
+        $this->periode_id = $periode_id;
     }
 
     public function query()
@@ -30,6 +32,10 @@ class KuesionerExport implements FromQuery, WithHeadings, WithMapping, WithStyle
 
         if ($this->ranting_id) {
             $query->where('ranting_id', $this->ranting_id);
+        }
+
+        if ($this->periode_id) {
+            $query->where('periode_id', $this->periode_id);
         }
 
         return $query;

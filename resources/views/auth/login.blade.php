@@ -8,7 +8,7 @@
             <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
         </div>
         <h2 class="text-3xl font-bold text-white">Selamat Datang</h2>
-        <p class="text-green-200 dark:text-gray-300 text-sm mt-2">Masuk ke akun RSSJ Anda</p>
+        <p class="text-green-200 dark:text-gray-300 text-sm mt-2">Halaman Masuk Khusus Admin RSSJ</p>
     </div>
 
     @if(session('success'))
@@ -49,8 +49,8 @@
             <label class="flex items-center text-green-200 dark:text-gray-400 cursor-pointer group">
                 <div class="relative flex items-center justify-center">
                     <input type="checkbox" name="remember" class="peer sr-only">
-                    <div class="w-5 h-5 border-2 border-green-500/50 dark:border-gray-500 rounded bg-green-900/30 dark:bg-gray-800 peer-checked:bg-yellow-400 peer-checked:border-yellow-400 transition-all duration-200"></div>
-                    <svg class="absolute w-3.5 h-3.5 text-green-900 opacity-0 peer-checked:opacity-100 transition-opacity duration-200 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <div class="w-5 h-5 border-2 border-green-500/50 dark:border-gray-400 rounded bg-green-900/30 dark:bg-gray-900/80 peer-checked:bg-yellow-400 peer-checked:border-yellow-400 dark:peer-checked:bg-yellow-400 dark:peer-checked:border-yellow-400 transition-all duration-200"></div>
+                    <svg class="absolute w-3.5 h-3.5 text-green-900 dark:text-gray-900 opacity-0 peer-checked:opacity-100 transition-opacity duration-200 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>

@@ -70,6 +70,21 @@
                             @enderror
                         </div>
 
+                        <!-- Filter Periode (Berlaku untuk semua role) -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Filter Berdasarkan Periode</label>
+                            <select name="periode_id" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all cursor-pointer shadow-sm">
+                                <option value="">-- Semua Periode --</option>
+                                @foreach($periodes as $periode)
+                                    <option value="{{ $periode->id }}">Tahun {{ $periode->tahun }} {!! $periode->is_active ? '&#10003; (Aktif)' : '' !!}</option>
+                                @endforeach
+                            </select>
+                            @error('periode_id')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                            <p class="text-xs text-gray-500 mt-2">Pilih tahun periode untuk membatasi data, atau biarkan kosong untuk mengunduh semua periode.</p>
+                        </div>
+
                         <!-- Filter Ranting (Khusus Superadmin) -->
                         @if(Auth::user()->role === 'superadmin')
                         <div>
