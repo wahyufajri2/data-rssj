@@ -77,6 +77,18 @@ class MenuHelper
                                 'name' => 'Periode',
                                 'path' => route('superadmin.periode.index', [], false),
                             ],
+                            [
+                                'name' => 'Daerah',
+                                'path' => route('superadmin.daerah.index', [], false),
+                            ],
+                            [
+                                'name' => 'Cabang',
+                                'path' => route('superadmin.cabang.index', [], false),
+                            ],
+                            [
+                                'name' => 'Ranting',
+                                'path' => route('superadmin.ranting.index', [], false),
+                            ],
                         ]
                     ],
                 ],

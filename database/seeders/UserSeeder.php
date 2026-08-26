@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
                 'name' => 'Superadmin RSSJ',
                 'password' => Hash::make('password123'),
                 'role' => 'superadmin',
+                'email_verified_at' => now(),
                 'is_active' => true,
             ]
         );
@@ -30,8 +31,8 @@ class UserSeeder extends Seeder
             $ranting = Ranting::firstOrCreate(
                 ['nama_ranting' => 'Ngadisuryan'],
                 [
-                    'cabang_id' => 1, // Fallback ke cabang ID 1
-                    'no_sk' => 'SK-NGADISURYAN-2026'
+                    'cabang_id' => 6, 
+                    'no_sk' => '1644/PPA/A/VII-92'
                 ]
             );
         }
@@ -43,6 +44,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password123'),
                 'role' => 'admin_ranting',
                 'ranting_id' => $ranting->id,
+                'email_verified_at' => now(),
                 'is_active' => true,
             ]
         );

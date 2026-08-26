@@ -89,6 +89,26 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/periode', [\App\Http\Controllers\PeriodeController::class, 'store'])->name('superadmin.periode.store');
                 Route::post('/periode/{periode}/toggle', [\App\Http\Controllers\PeriodeController::class, 'toggleActive'])->name('superadmin.periode.toggle');
                 Route::delete('/periode/{periode}', [\App\Http\Controllers\PeriodeController::class, 'destroy'])->name('superadmin.periode.destroy');
+
+                // Pengaturan Daerah, Cabang, Ranting
+                Route::resource('daerah', \App\Http\Controllers\DaerahController::class)->except(['create', 'show', 'edit'])->names([
+                    'index' => 'superadmin.daerah.index',
+                    'store' => 'superadmin.daerah.store',
+                    'update' => 'superadmin.daerah.update',
+                    'destroy' => 'superadmin.daerah.destroy',
+                ]);
+                Route::resource('cabang', \App\Http\Controllers\CabangController::class)->except(['create', 'show', 'edit'])->names([
+                    'index' => 'superadmin.cabang.index',
+                    'store' => 'superadmin.cabang.store',
+                    'update' => 'superadmin.cabang.update',
+                    'destroy' => 'superadmin.cabang.destroy',
+                ]);
+                Route::resource('ranting', \App\Http\Controllers\RantingController::class)->except(['create', 'show', 'edit'])->names([
+                    'index' => 'superadmin.ranting.index',
+                    'store' => 'superadmin.ranting.store',
+                    'update' => 'superadmin.ranting.update',
+                    'destroy' => 'superadmin.ranting.destroy',
+                ]);
             });
 
             // Data Collection Routes (Accessible by both roles, controllers handle data filtering)

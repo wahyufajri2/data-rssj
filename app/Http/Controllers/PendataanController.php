@@ -6,20 +6,53 @@ use App\Models\PendataanKeluarga;
 use App\Models\Periode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class PendataanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = PendataanKeluarga::query()->with(['user', 'ranting']);
+        if ($request->ajax()) {
+            $query = PendataanKeluarga::query()->with(['user', 'ranting.cabang.daerah'])->select('pendataan_keluargas.*');
 
-        if (Auth::user()->role === 'admin_ranting') {
-            $query->where('ranting_id', Auth::user()->ranting_id);
+            if (Auth::user()->role === 'admin_ranting') {
+                $query->where('ranting_id', Auth::user()->ranting_id);
+            }
+            
+            // Add filtering logic here if needed based on the request (e.g., status_kesehatan)
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('nama_kk', function($row) {
+                    return $row->nama_kk;
+                })
+                ->addColumn('alamat', function($row) {
+                    $alamat = $row->alamat_dusun;
+                    if ($row->no_rumah) {
+                        $alamat .= ' No. ' . $row->no_rumah;
+                    }
+                    return $alamat;
+                })
+                ->addColumn('ranting', function($row) {
+                    return $row->ranting->nama_ranting ?? '-';
+                })
+                ->addColumn('status_kesehatan', function($row) {
+                    $status = strtolower($row->status_kesehatan);
+                    $badges = [
+                        'sehat' => '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>Sehat</span>',
+                        'resiko' => '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>Resiko</span>',
+                        'jiwa' => '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>Gangguan Jiwa</span>'
+                    ];
+                    return $badges[$status] ?? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">Unknown</span>';
+                })
+                ->addColumn('action', function($row) {
+                    return view('pendataan.partials.action', compact('row'))->render();
+                })
+                ->rawColumns(['status_kesehatan', 'action'])
+                ->make(true);
         }
 
-        $data = $query->latest()->cursorPaginate(50);
-
-        return view('pendataan.index', compact('data'));
+        return view('pendataan.index');
     }
 
     public function create()

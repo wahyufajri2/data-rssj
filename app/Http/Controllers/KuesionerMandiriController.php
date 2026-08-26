@@ -6,20 +6,49 @@ use App\Models\KuesionerMandiri;
 use App\Models\Periode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class KuesionerMandiriController extends Controller
 {
     public function index(Request $request)
     {
-        $query = KuesionerMandiri::query()->with(['user', 'ranting']);
+        if ($request->ajax()) {
+            $query = KuesionerMandiri::query()->with(['user', 'ranting.cabang.daerah'])->select('kuesioner_mandiris.*');
 
-        if (Auth::user()->role === 'admin_ranting') {
-            $query->where('ranting_id', Auth::user()->ranting_id);
+            if (Auth::user()->role === 'admin_ranting') {
+                $query->where('ranting_id', Auth::user()->ranting_id);
+            }
+            
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('nama', function($row) {
+                    return $row->nama;
+                })
+                ->addColumn('ranting', function($row) {
+                    return $row->ranting->nama_ranting ?? '-';
+                })
+                ->addColumn('skor_srq', function($row) {
+                    $color = $row->skor_srq >= 6 ? 'red' : 'emerald';
+                    return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-'.$color.'-100 text-'.$color.'-800 dark:bg-'.$color.'-900/30 dark:text-'.$color.'-400">'.$row->skor_srq.'</span>';
+                })
+                ->addColumn('skor_kebiasaan', function($row) {
+                    $color = 'gray';
+                    if ($row->skor_kebiasaan >= 25) $color = 'emerald';
+                    elseif ($row->skor_kebiasaan >= 16) $color = 'amber';
+                    else $color = 'red';
+                    return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-'.$color.'-100 text-'.$color.'-800 dark:bg-'.$color.'-900/30 dark:text-'.$color.'-400">'.$row->skor_kebiasaan.'</span>';
+                })
+                ->addColumn('tanggal_mengisi', function($row) {
+                    return $row->tanggal_mengisi ? \Carbon\Carbon::parse($row->tanggal_mengisi)->format('d M Y') : '-';
+                })
+                ->addColumn('action', function($row) {
+                    return view('kuesioner.partials.action', compact('row'))->render();
+                })
+                ->rawColumns(['skor_srq', 'skor_kebiasaan', 'action'])
+                ->make(true);
         }
 
-        $data = $query->latest()->cursorPaginate(50);
-
-        return view('kuesioner.index', compact('data'));
+        return view('kuesioner.index');
     }
 
     public function create()
