@@ -55,14 +55,14 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-    // ================= REGISTER SECRET =================
-    public function showSecretRegister()
+    // ================= REGISTER ADMIN =================
+    public function showRegisterAdmin()
     {
         $rantings = Ranting::all();
-        return view('auth.register-secret', compact('rantings'));
+        return view('auth.register-admin', compact('rantings'));
     }
 
-    public function processSecretRegister(Request $request)
+    public function processRegisterAdmin(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -80,8 +80,8 @@ class AuthController extends Controller
             'is_active' => false,
         ]);
 
-        return redirect()->route('superadmin.users.index', ['role' => Auth::user()->role])
-                         ->with('success', 'Akun Admin Ranting berhasil didaftarkan.');
+        return redirect()->route('login')
+                         ->with('success', 'Akun Admin Ranting berhasil didaftarkan. Silakan tunggu persetujuan dari Superadmin untuk dapat login.');
     }
 
     // ================= LUPA PASSWORD =================

@@ -19,14 +19,15 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Register admin ranting (Public)
+Route::get('/register-admin-ranting-secret', [AuthController::class, 'showRegisterAdmin'])->name('register.admin');
+Route::post('/register-admin-ranting-secret', [AuthController::class, 'processRegisterAdmin'])->name('register.admin.submit');
+
 // Guest Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 
-    // Register admin ranting route moved outside guest so Superadmin can access/verify it if needed,
-    // but typically accessed by unauthenticated users via shared WA link.
-    
     // Password Reset
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
     Route::post('/forgot-password', [AuthController::class, 'processForgotPassword'])->name('password.email');
@@ -65,10 +66,8 @@ Route::middleware(['auth'])->group(function () {
         return back()->with('success', 'Tautan verifikasi telah dikirim ulang ke email Anda.');
     })->middleware(['throttle:6,1'])->name('verification.send');
 
-    // Register Admin Ranting (Hanya Superadmin)
+    // Register Admin Ranting (Hanya Superadmin) - Dihapus karena sudah dipindah ke public
     Route::middleware(['role:superadmin'])->group(function () {
-        Route::get('/register-admin-ranting-secret', [AuthController::class, 'showSecretRegister'])->name('register.secret');
-        Route::post('/register-admin-ranting-secret', [AuthController::class, 'processSecretRegister'])->name('register.secret.submit');
     });
 
     Route::middleware(['active_user', 'set_role_prefix'])->prefix('{role}')->group(function () {

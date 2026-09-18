@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <form action="{{ route('register.secret.submit') }}" method="POST" class="space-y-4">
+    <form action="{{ route('register.admin.submit') }}" method="POST" class="space-y-4">
         @csrf
         <div>
             <label class="block text-sm font-medium text-green-100 dark:text-gray-300 mb-1">Nama Lengkap</label>
@@ -93,7 +93,7 @@
         </button>
         
         <div class="mt-4 text-center text-sm text-green-200 dark:text-gray-400">
-            <a href="{{ route('superadmin.users.index', ['role' => Auth::user()->role]) }}" class="text-yellow-400 hover:text-yellow-300 font-medium underline transition-colors">&larr; Kembali ke Manajemen Pengguna</a>
+            <a href="{{ route('login') }}" class="text-yellow-400 hover:text-yellow-300 font-medium underline transition-colors">&larr; Sudah punya akun? Login di sini</a>
         </div>
     </form>
 </div>
