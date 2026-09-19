@@ -35,6 +35,25 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'processResetPassword'])->name('password.update');
 });
 
+// Email Verification Verify Route (Tanpa Auth/Login)
+Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+    $user = \App\Models\User::findOrFail($id);
+
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        abort(403, 'Link verifikasi tidak valid atau sudah kedaluwarsa.');
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return redirect()->route('login')->with('success', 'Email sudah diverifikasi sebelumnya. Silakan tunggu persetujuan Superadmin.');
+    }
+
+    if ($user->markEmailAsVerified()) {
+        event(new \Illuminate\Auth\Events\Verified($user));
+    }
+
+    return redirect()->route('login')->with('success', 'Email berhasil diverifikasi! Data Anda kini telah masuk dan menunggu persetujuan dari Superadmin.');
+})->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+
 // Public Kuesioner Routes
 Route::get('/kuesioner-umum', [PublicKuesionerController::class, 'create'])->name('public.kuesioner.create');
 Route::post('/kuesioner-umum', [PublicKuesionerController::class, 'store'])->name('public.kuesioner.store');
@@ -50,16 +69,10 @@ Route::get('/kuesioner-umum/sukses', function() {
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Email Verification Routes
+    // Email Verification Routes (yang butuh login)
     Route::get('/email/verify', function () {
         return view('auth.verify-email');
     })->name('verification.notice');
-    
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill();
-        $rolePrefix = Auth::user()->role === 'admin_ranting' ? 'admin-ranting' : Auth::user()->role;
-        return redirect()->route('dashboard', ['role' => $rolePrefix])->with('success', 'Email berhasil diverifikasi!');
-    })->middleware(['signed'])->name('verification.verify');
     
     Route::post('/email/verification-notification', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();

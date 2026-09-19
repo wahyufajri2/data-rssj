@@ -23,8 +23,11 @@ class PendataanController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-                ->addColumn('nama_kk', function($row) {
-                    return $row->nama_kk;
+                ->addColumn('no_kk', function($row) {
+                    return $row->no_kk;
+                })
+                ->addColumn('nama_lengkap', function($row) {
+                    return $row->nama_lengkap;
                 })
                 ->addColumn('alamat', function($row) {
                     $alamat = $row->alamat_dusun;
@@ -64,7 +67,10 @@ class PendataanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_kk' => 'required|string|max:255',
+            'no_kk' => 'required|string|max:255',
+            'nik' => 'required|string|max:255',
+            'status_keluarga' => 'required|string|in:Ayah,Ibu,Anak,Lainnya',
+            'nama_lengkap' => 'required|string|max:255',
             'umur' => 'required|integer|min:0',
             'status_kawin' => 'required|string',
             'pendidikan' => 'required|string',
@@ -73,6 +79,7 @@ class PendataanController extends Controller
             'no_rumah' => 'nullable|string',
             'indikator_gj' => 'nullable|array',
             'indikator_rmp' => 'nullable|array',
+            'indikator_rmp_lainnya' => 'nullable|string|max:255',
         ]);
 
         if (Auth::user()->role === 'superadmin') {
@@ -92,11 +99,22 @@ class PendataanController extends Controller
             $status_kesehatan = 'resiko'; // Prioritas 2
         }
 
+        // Proses "Lainnya" pada indikator_rmp
+        $indikator_rmp = $validated['indikator_rmp'] ?? [];
+        if (($key = array_search('Lainnya(tulis sendiri)', $indikator_rmp)) !== false) {
+            if ($request->filled('indikator_rmp_lainnya')) {
+                $indikator_rmp[$key] = 'Lainnya: ' . $request->input('indikator_rmp_lainnya');
+            }
+        }
+
         PendataanKeluarga::create([
             'periode_id' => $periodeAktif->id,
             'user_id' => Auth::id(),
             'ranting_id' => Auth::user()->role === 'admin_ranting' ? Auth::user()->ranting_id : $request->input('ranting_id'),
-            'nama_kk' => $validated['nama_kk'],
+            'no_kk' => $validated['no_kk'],
+            'nik' => $validated['nik'],
+            'status_keluarga' => $validated['status_keluarga'],
+            'nama_lengkap' => $validated['nama_lengkap'],
             'umur' => $validated['umur'],
             'status_kawin' => $validated['status_kawin'],
             'pendidikan' => $validated['pendidikan'],
@@ -104,7 +122,7 @@ class PendataanController extends Controller
             'alamat_dusun' => $validated['alamat_dusun'],
             'no_rumah' => $validated['no_rumah'] ?? null,
             'indikator_gj' => $validated['indikator_gj'] ?? [],
-            'indikator_rmp' => $validated['indikator_rmp'] ?? [],
+            'indikator_rmp' => $indikator_rmp,
             'status_kesehatan' => $status_kesehatan,
         ]);
 
@@ -143,7 +161,10 @@ class PendataanController extends Controller
         }
 
         $validated = $request->validate([
-            'nama_kk' => 'required|string|max:255',
+            'no_kk' => 'required|string|max:255',
+            'nik' => 'required|string|max:255',
+            'status_keluarga' => 'required|string|in:Ayah,Ibu,Anak,Lainnya',
+            'nama_lengkap' => 'required|string|max:255',
             'umur' => 'required|integer|min:0',
             'status_kawin' => 'required|string',
             'pendidikan' => 'required|string',
@@ -152,6 +173,7 @@ class PendataanController extends Controller
             'no_rumah' => 'nullable|string',
             'indikator_gj' => 'nullable|array',
             'indikator_rmp' => 'nullable|array',
+            'indikator_rmp_lainnya' => 'nullable|string|max:255',
         ]);
 
         if (Auth::user()->role === 'superadmin') {
@@ -171,7 +193,16 @@ class PendataanController extends Controller
         
         // Ensure arrays are at least empty array if null
         $validated['indikator_gj'] = $validated['indikator_gj'] ?? [];
-        $validated['indikator_rmp'] = $validated['indikator_rmp'] ?? [];
+        $indikator_rmp = $validated['indikator_rmp'] ?? [];
+
+        // Proses "Lainnya" pada indikator_rmp
+        if (($key = array_search('Lainnya(tulis sendiri)', $indikator_rmp)) !== false) {
+            if ($request->filled('indikator_rmp_lainnya')) {
+                $indikator_rmp[$key] = 'Lainnya: ' . $request->input('indikator_rmp_lainnya');
+            }
+        }
+        
+        $validated['indikator_rmp'] = $indikator_rmp;
 
         $pendataan->update($validated);
 

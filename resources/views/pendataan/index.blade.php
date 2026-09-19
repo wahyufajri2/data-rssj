@@ -25,7 +25,8 @@
                 <thead class="bg-gray-50 dark:bg-gray-700/50">
                     <tr class="text-left text-xs font-semibold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         <th>No</th>
-                        <th>Nama KK</th>
+                        <th>No. KK</th>
+                        <th>Nama Lengkap</th>
                         <th>Ranting</th>
                         <th>Status Kesehatan</th>
                         <th>Alamat</th>
@@ -50,7 +51,8 @@
             ajax: "{{ route('pendataan.index') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'nama_kk', name: 'nama_kk' },
+                { data: 'no_kk', name: 'no_kk' },
+                { data: 'nama_lengkap', name: 'nama_lengkap' },
                 { data: 'ranting', name: 'ranting.nama_ranting' },
                 { data: 'status_kesehatan', name: 'status_kesehatan' },
                 { data: 'alamat', name: 'alamat_dusun' }, // or search by both alamat_dusun and no_rumah depending on requirements, but name field matches main column

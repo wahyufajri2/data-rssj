@@ -2,73 +2,7 @@
 
 @section('content')
 <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-5xl mx-auto" x-data="{ 
-        step: 1,
-        srq_answers: Array(20).fill(null),
-        kebiasaan_answers: Array(8).fill(null),
-        
-        submitForm(e) {
-            e.preventDefault();
-            
-            if(this.srq_answers.includes(null) || this.kebiasaan_answers.includes(null)) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Peringatan',
-                    text: 'Mohon lengkapi semua jawaban kuesioner dan kebiasaan.',
-                    confirmButtonColor: '#3085d6',
-                });
-                return;
-            }
-
-            let srqScore = this.srq_answers.reduce((a, b) => a + parseInt(b), 0);
-            let kebScore = this.kebiasaan_answers.reduce((a, b) => a + parseInt(b), 0);
-
-            let srqInterp = srqScore >= 6 ? 'KIP-K, Manajemen faktor risiko, Rujukan' : 'Edukasi (Pola hidup, Relaksasi, Manajemen Stres, Koping)';
-            
-            let kebInterp = '';
-            if(kebScore >= 25 && kebScore <= 32) kebInterp = 'Kebiasaan Baik';
-            else if(kebScore >= 16 && kebScore <= 24) kebInterp = 'Kebiasaan Cukup';
-            else kebInterp = 'Kebiasaan Kurang';
-
-            let htmlMsg = `<div class='text-left mt-2 text-sm text-gray-700'>
-                <div class='mb-4 bg-indigo-50 p-3 rounded-lg border border-indigo-100'>
-                    <strong class='text-gray-900 block mb-1 text-base'>Skor SRQ-20: ${srqScore}</strong>
-                    <span class='text-indigo-700 font-medium'>Tindak Lanjut:</span> ${srqInterp}
-                </div>
-                <div class='bg-emerald-50 p-3 rounded-lg border border-emerald-100'>
-                    <strong class='text-gray-900 block mb-1 text-base'>Skor Kebiasaan Sehari-hari: ${kebScore}</strong>
-                    <span class='text-emerald-700 font-medium'>Status:</span> ${kebInterp}
-                </div>
-            </div>
-            <p class='mt-5 text-gray-800 font-semibold text-base'>Apakah Anda yakin ingin menyimpan data ini?</p>`;
-
-            Swal.fire({
-                title: 'Ringkasan Interpretasi',
-                html: htmlMsg,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#059669', // emerald-600
-                cancelButtonColor: '#6b7280', // gray-500
-                confirmButtonText: 'Ya, Simpan Data',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    e.target.submit();
-                }
-            });
-        },
-        
-        progressPercent() {
-            if(this.step === 1) {
-                let filled = this.srq_answers.filter(x => x !== null).length;
-                return Math.floor((filled / 20) * 50);
-            } else {
-                let filled = this.kebiasaan_answers.filter(x => x !== null).length;
-                return 50 + Math.floor((filled / 8) * 50);
-            }
-        }
-    }">
+    <div class="max-w-5xl mx-auto" x-data="kuesionerForm()">
         
         <!-- Header Section -->
         <div class="relative rounded-2xl overflow-hidden mb-8 shadow-lg">
@@ -142,7 +76,7 @@
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">NIK (16 Digit) <span class="text-red-500">*</span></label>
-                                <input type="text" name="nik" :required="step === 1" maxlength="16" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" name="nik" :required="step === 1" maxlength="16" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Mengisi <span class="text-red-500">*</span></label>
@@ -307,7 +241,7 @@
                                 'Membaca Al Qur\'an',
                                 'Makan buah setiap hari',
                                 'Makan sayur setiap hari',
-                                'Aktifitas fisik (membersihkan rumah, dsb)'
+                                'Aktifitas fisik minimal 30 menit sehari'
                             ];
                         @endphp
 
@@ -439,4 +373,91 @@
         border-color: #9ca3af transparent transparent transparent !important;
     }
 </style>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('kuesionerForm', () => ({
+            step: 1,
+            srq_answers: Array(20).fill(null),
+            kebiasaan_answers: Array(8).fill(null),
+            
+            submitForm(e) {
+                e.preventDefault();
+                
+                if(this.srq_answers.includes(null) || this.kebiasaan_answers.includes(null)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Peringatan',
+                        text: 'Mohon lengkapi semua jawaban kuesioner dan kebiasaan.',
+                        confirmButtonColor: '#3085d6',
+                    });
+                    return;
+                }
+
+                let srqScore = this.srq_answers.reduce((a, b) => a + parseInt(b), 0);
+                let kebScore = this.kebiasaan_answers.reduce((a, b) => a + parseInt(b), 0);
+
+                let srqInterp = '';
+                if (srqScore >= 6) {
+                    srqInterp = `<div class="mt-2 text-sm text-gray-700 font-normal">Langkah tindak lanjut yang perlu dilakukan secara berurutan:
+                        <ol class="list-decimal ml-5 mt-1 space-y-1 text-left">
+                            <li>Mengobrol dari Hati ke Hati dengan Pendamping Terlatih (Konseling)</li>
+                            <li>Meredam Pemicu Stres agar Tidak Semakin Berat (Pencegahan)</li>
+                            <li>Meneruskan Penanganan ke Ahlinya (Rujukan)</li>
+                        </ol></div>`;
+                } else {
+                    srqInterp = `<div class="mt-2 text-sm text-gray-700 font-normal">Langkah tindak lanjut yang dapat dilakukan secara berurutan:
+                        <ol class="list-decimal ml-5 mt-1 space-y-1 text-left">
+                            <li>Pertahankan Pola Hidup Sehat</li>
+                            <li>Mengistirahatkan Jiwa dan Raga (Relaksasi)</li>
+                            <li>Mengurai Beban Pikiran (Manajemen Stres)</li>
+                            <li>Menghadapi Masalah dengan Cara yang Sehat (Mekanisme Koping)</li>
+                        </ol></div>`;
+                }
+                
+                let kebInterp = '';
+                if(kebScore >= 25 && kebScore <= 32) kebInterp = 'Baik';
+                else if(kebScore >= 16 && kebScore <= 24) kebInterp = 'Cukup';
+                else kebInterp = 'Kurang';
+
+                let htmlMsg = `<div class='text-left mt-2 text-sm text-gray-700'>
+                    <div class='mb-4 bg-indigo-50 p-3 rounded-lg border border-indigo-100'>
+                        <strong class='text-gray-900 block mb-1 text-base'>Skor SRQ-20: ${srqScore}</strong>
+                        <div class='text-indigo-700 font-medium mt-2'>Tindak Lanjut: ${srqInterp}</div>
+                    </div>
+                    <div class='bg-emerald-50 p-3 rounded-lg border border-emerald-100'>
+                        <strong class='text-gray-900 block mb-1 text-base'>Skor Kebiasaan Sehari-hari: ${kebScore}</strong>
+                        <span class='text-emerald-700 font-medium'>Status:</span> ${kebInterp}
+                    </div>
+                </div>
+                <p class='mt-5 text-gray-800 font-semibold text-base'>Apakah Anda yakin ingin menyimpan data ini?</p>`;
+
+                Swal.fire({
+                    title: 'Ringkasan Interpretasi',
+                    html: htmlMsg,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Simpan Data',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        e.target.submit();
+                    }
+                });
+            },
+            
+            progressPercent() {
+                if(this.step === 1) {
+                    let filled = this.srq_answers.filter(x => x !== null).length;
+                    return Math.floor((filled / 20) * 50);
+                } else {
+                    let filled = this.kebiasaan_answers.filter(x => x !== null).length;
+                    return 50 + Math.floor((filled / 8) * 50);
+                }
+            }
+        }));
+    });
+</script>
 @endsection

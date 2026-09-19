@@ -12,7 +12,10 @@ class UserController extends Controller
     public function index()
     {
         // Hanya Superadmin yang bisa mengakses ini (diatur di web.php middleware role:superadmin)
-        $users = User::with('ranting')->where('role', 'admin_ranting')->paginate(20);
+        $users = User::with('ranting')
+            ->where('role', 'admin_ranting')
+            ->whereNotNull('email_verified_at')
+            ->paginate(20);
         return view('superadmin.users.index', compact('users'));
     }
 

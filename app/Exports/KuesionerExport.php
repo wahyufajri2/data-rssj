@@ -63,6 +63,22 @@ class KuesionerExport implements FromQuery, WithHeadings, WithMapping, WithStyle
 
     public function map($row): array
     {
+        $interpretasi_srq = '';
+        if ($row->skor_srq >= 6) {
+            $interpretasi_srq = "1. Mengobrol dari Hati ke Hati dengan Pendamping Terlatih (Konseling)\n2. Meredam Pemicu Stres agar Tidak Semakin Berat (Pencegahan)\n3. Meneruskan Penanganan ke Ahlinya (Rujukan)";
+        } else {
+            $interpretasi_srq = "1. Pertahankan Pola Hidup Sehat\n2. Mengistirahatkan Jiwa dan Raga (Relaksasi)\n3. Mengurai Beban Pikiran (Manajemen Stres)\n4. Menghadapi Masalah dengan Cara yang Sehat (Mekanisme Koping)";
+        }
+
+        $interpretasi_kebiasaan = '';
+        if ($row->skor_kebiasaan >= 25 && $row->skor_kebiasaan <= 32) {
+            $interpretasi_kebiasaan = 'Baik';
+        } elseif ($row->skor_kebiasaan >= 16 && $row->skor_kebiasaan <= 24) {
+            $interpretasi_kebiasaan = 'Cukup';
+        } else {
+            $interpretasi_kebiasaan = 'Kurang';
+        }
+
         return [
             $row->id,
             $row->periode->tahun ?? '-',
@@ -75,9 +91,9 @@ class KuesionerExport implements FromQuery, WithHeadings, WithMapping, WithStyle
             $row->umur,
             $row->agama,
             $row->skor_srq,
-            $row->interpretasi_srq,
+            $interpretasi_srq,
             $row->skor_kebiasaan,
-            $row->interpretasi_kebiasaan,
+            $interpretasi_kebiasaan,
         ];
     }
 

@@ -13,22 +13,103 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $isSuperadmin = $user->role === 'superadmin';
-        $rantingId = $user->ranting_id;
+        
+        $requestRantingId = $request->input('ranting_id');
+        if ($isSuperadmin && $requestRantingId && $requestRantingId !== 'all') {
+            $filterRantingId = $requestRantingId;
+        } elseif (!$isSuperadmin) {
+            $filterRantingId = $user->ranting_id;
+        } else {
+            $filterRantingId = null;
+        }
+
+        $rantings = Ranting::all();
 
         // --- STATISTIK UMUM ---
+        $adminQuery = User::where('role', 'admin_ranting');
+        if ($filterRantingId) {
+            $adminQuery->where('ranting_id', $filterRantingId);
+        }
+
+        $pendataanQuery = PendataanKeluarga::query();
+        $kuesionerQuery = KuesionerMandiri::query();
+        
+        if ($filterRantingId) {
+            $pendataanQuery->where('ranting_id', $filterRantingId);
+            $kuesionerQuery->where('ranting_id', $filterRantingId);
+        }
+
+        $totalIndividuPendataan = $pendataanQuery->count();
+        $totalKuesioner = $kuesionerQuery->count();
+        
+        // Clone for distinct keluarga
+        $keluargaQueryBase = clone $pendataanQuery;
+        $totalKeluarga = $keluargaQueryBase->distinct('no_kk')->count('no_kk');
+
         $stats = [
-            'total_admin' => $isSuperadmin ? User::where('role', 'admin_ranting')->count() : 0,
-            'total_pendataan' => $isSuperadmin 
-                ? PendataanKeluarga::count() 
-                : PendataanKeluarga::where('ranting_id', $rantingId)->count(),
-            'total_kuesioner' => $isSuperadmin 
-                ? KuesionerMandiri::count() 
-                : KuesionerMandiri::where('ranting_id', $rantingId)->count(),
+            'total_admin' => $isSuperadmin ? $adminQuery->count() : 0,
+            'total_keluarga' => $totalKeluarga,
+            'total_individu' => $totalIndividuPendataan + $totalKuesioner,
+            'total_kuesioner' => $totalKuesioner,
+            'individu_pendataan' => $totalIndividuPendataan,
         ];
+
+        // --- PIE CHART & DETAIL STATUS (STATUS KESEHATAN) ---
+        // Status kesehatan Individu
+        $statusIndividuQuery = PendataanKeluarga::select('status_kesehatan', DB::raw('count(*) as total'))
+            ->groupBy('status_kesehatan');
+            
+        if ($filterRantingId) {
+            $statusIndividuQuery->where('ranting_id', $filterRantingId);
+        }
+        $statusIndividuData = $statusIndividuQuery->get();
+        
+        $pieLabels = ['Sehat Jiwa', 'ODK (Resiko)', 'ODGJ (Jiwa)'];
+        $pieSeriesIndividu = [0, 0, 0];
+        foreach ($statusIndividuData as $row) {
+            if ($row->status_kesehatan == 'sehat') $pieSeriesIndividu[0] += $row->total;
+            if ($row->status_kesehatan == 'resiko') $pieSeriesIndividu[1] += $row->total;
+            if ($row->status_kesehatan == 'jiwa') $pieSeriesIndividu[2] += $row->total;
+        }
+        
+        $stats['individu_sehat'] = $pieSeriesIndividu[0];
+        $stats['individu_resiko'] = $pieSeriesIndividu[1];
+        $stats['individu_jiwa'] = $pieSeriesIndividu[2];
+
+        // Status kesehatan Keluarga (berdasarkan no_kk)
+        $keluargaQuery = PendataanKeluarga::select('no_kk', 'status_kesehatan');
+        if ($filterRantingId) {
+            $keluargaQuery->where('ranting_id', $filterRantingId);
+        }
+        $keluargaData = $keluargaQuery->get();
+        
+        $keluargaStatus = [];
+        foreach ($keluargaData as $row) {
+            if (!isset($keluargaStatus[$row->no_kk])) {
+                $keluargaStatus[$row->no_kk] = 'sehat';
+            }
+            if ($row->status_kesehatan == 'jiwa') {
+                $keluargaStatus[$row->no_kk] = 'jiwa';
+            } elseif ($row->status_kesehatan == 'resiko' && $keluargaStatus[$row->no_kk] != 'jiwa') {
+                $keluargaStatus[$row->no_kk] = 'resiko';
+            }
+        }
+        
+        $pieSeriesKeluarga = [0, 0, 0];
+        foreach ($keluargaStatus as $status) {
+            if ($status == 'sehat') $pieSeriesKeluarga[0]++;
+            if ($status == 'resiko') $pieSeriesKeluarga[1]++;
+            if ($status == 'jiwa') $pieSeriesKeluarga[2]++;
+        }
+        
+        $stats['keluarga_sehat'] = $pieSeriesKeluarga[0];
+        $stats['keluarga_resiko'] = $pieSeriesKeluarga[1];
+        $stats['keluarga_jiwa'] = $pieSeriesKeluarga[2];
+
 
         // --- LINE CHART (TREN 6 BULAN TERAKHIR) ---
         $months = [];
@@ -39,48 +120,26 @@ class DashboardController extends Controller
             $date = Carbon::now()->startOfMonth()->subMonths($i);
             $months[] = $date->translatedFormat('M Y'); // e.g. "Jul 2026"
             
-            $pendataanQuery = PendataanKeluarga::whereYear('created_at', $date->year)
+            $pendataanQ = PendataanKeluarga::whereYear('created_at', $date->year)
                 ->whereMonth('created_at', $date->month);
-            $kuesionerQuery = KuesionerMandiri::whereYear('created_at', $date->year)
+            $kuesionerQ = KuesionerMandiri::whereYear('created_at', $date->year)
                 ->whereMonth('created_at', $date->month);
 
-            if (!$isSuperadmin) {
-                $pendataanQuery->where('ranting_id', $rantingId);
-                $kuesionerQuery->where('ranting_id', $rantingId);
+            if ($filterRantingId) {
+                $pendataanQ->where('ranting_id', $filterRantingId);
+                $kuesionerQ->where('ranting_id', $filterRantingId);
             }
 
-            $pendataanTrend[] = $pendataanQuery->count();
-            $kuesionerTrend[] = $kuesionerQuery->count();
-        }
-
-        // --- PIE CHART (STATUS KESEHATAN) ---
-        // Status kesehatan dari PendataanKeluarga
-        $statusQuery = PendataanKeluarga::select('status_kesehatan', DB::raw('count(*) as total'))
-            ->groupBy('status_kesehatan');
-            
-        if (!$isSuperadmin) {
-            $statusQuery->where('ranting_id', $rantingId);
-        }
-        
-        $statusData = $statusQuery->get();
-        
-        // Memastikan ketiga kategori selalu ada walau 0
-        $pieLabels = ['Sehat Jiwa', 'ODGJ', 'ODK'];
-        $pieSeries = [0, 0, 0];
-        
-        foreach ($statusData as $row) {
-            $idx = array_search($row->status_kesehatan, $pieLabels);
-            if ($idx !== false) {
-                $pieSeries[$idx] = $row->total;
-            }
+            $pendataanTrend[] = $pendataanQ->count();
+            $kuesionerTrend[] = $kuesionerQ->count();
         }
 
         // --- BAR CHART (PERBANDINGAN WILAYAH/DUSUN) ---
         $barLabels = [];
         $barSeries = [];
         
-        if ($isSuperadmin) {
-            // Superadmin: Top 5 Ranting by Pendataan
+        if (!$filterRantingId) {
+            // Superadmin (Semua Ranting): Top 5 Ranting by Pendataan
             $rantingData = PendataanKeluarga::select('ranting_id', DB::raw('count(*) as total'))
                 ->with('ranting')
                 ->groupBy('ranting_id')
@@ -94,8 +153,8 @@ class DashboardController extends Controller
             }
             $barTitle = 'Top 5 Ranting (Jumlah Pendataan)';
         } else {
-            // Admin Ranting: Jumlah Pendataan per Dusun
-            $dusunData = PendataanKeluarga::where('ranting_id', $rantingId)
+            // Filtered Ranting: Jumlah Pendataan per Dusun
+            $dusunData = PendataanKeluarga::where('ranting_id', $filterRantingId)
                 ->select('alamat_dusun', DB::raw('count(*) as total'))
                 ->groupBy('alamat_dusun')
                 ->orderByDesc('total')
@@ -112,8 +171,9 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'stats',
             'months', 'pendataanTrend', 'kuesionerTrend',
-            'pieLabels', 'pieSeries',
-            'barLabels', 'barSeries', 'barTitle'
+            'pieLabels', 'pieSeriesIndividu', 'pieSeriesKeluarga',
+            'barLabels', 'barSeries', 'barTitle',
+            'rantings', 'filterRantingId', 'isSuperadmin'
         ));
     }
 }

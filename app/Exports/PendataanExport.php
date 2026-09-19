@@ -74,7 +74,7 @@ class PendataanExport implements FromQuery, WithHeadings, WithMapping, WithStyle
             $row->pekerjaan,
             $row->alamat_dusun,
             $row->no_rumah,
-            strtoupper($row->status_kesehatan),
+            $row->status_kesehatan === 'jiwa' ? 'Gangguan Jiwa' : ($row->status_kesehatan === 'resiko' ? 'Resiko Masalah Psikososial' : 'Sehat'),
             $row->created_at ? $row->created_at->format('Y-m-d H:i') : '-',
         ];
     }

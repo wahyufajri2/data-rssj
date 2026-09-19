@@ -28,15 +28,6 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            
-            if (!Auth::user()->is_active) {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-                return back()->withErrors([
-                    'email' => 'Akun Anda belum diaktifkan oleh Superadmin.',
-                ])->onlyInput('email');
-            }
 
             $rolePrefix = Auth::user()->role === 'admin_ranting' ? 'admin-ranting' : Auth::user()->role;
             return redirect()->intended(route('dashboard', ['role' => $rolePrefix]));
@@ -71,7 +62,7 @@ class AuthController extends Controller
             'ranting_id' => ['required', 'exists:rantings,id'],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
@@ -80,8 +71,10 @@ class AuthController extends Controller
             'is_active' => false,
         ]);
 
+        event(new \Illuminate\Auth\Events\Registered($user));
+
         return redirect()->route('login')
-                         ->with('success', 'Akun Admin Ranting berhasil didaftarkan. Silakan tunggu persetujuan dari Superadmin untuk dapat login.');
+                         ->with('success', 'Akun Admin Ranting berhasil didaftarkan. Silakan cek email Anda untuk melakukan verifikasi akun. Setelah diverifikasi, Superadmin akan menyetujui akun Anda.');
     }
 
     // ================= LUPA PASSWORD =================

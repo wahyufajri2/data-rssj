@@ -6,6 +6,7 @@
     <div class="max-w-5xl mx-auto" x-data="{ 
         indikator_gj: [], 
         indikator_rmp: [],
+        lainnya_text: '',
         
         get statusKesehatan() {
             if (this.indikator_gj.length > 0) {
@@ -76,8 +77,26 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-1">
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">Nama Kepala Keluarga <span class="text-red-500 ml-1">*</span></label>
-                            <input type="text" name="nama_kk" placeholder="Masukkan nama lengkap" required class="block w-full rounded-lg border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors py-2.5 px-4 dark:text-white">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">No. KK <span class="text-red-500 ml-1">*</span></label>
+                            <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" name="no_kk" placeholder="Masukkan Nomor Kartu Keluarga" required class="block w-full rounded-lg border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors py-2.5 px-4 dark:text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">NIK <span class="text-red-500 ml-1">*</span></label>
+                            <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" name="nik" placeholder="Masukkan Nomor Induk Kependudukan" required class="block w-full rounded-lg border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors py-2.5 px-4 dark:text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">Status di Keluarga <span class="text-red-500 ml-1">*</span></label>
+                            <select name="status_keluarga" required class="block w-full rounded-lg border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors py-2.5 px-4 dark:text-white appearance-none">
+                                <option value="">Pilih Status</option>
+                                <option value="Ayah">Ayah</option>
+                                <option value="Ibu">Ibu</option>
+                                <option value="Anak">Anak</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">Nama Lengkap <span class="text-red-500 ml-1">*</span></label>
+                            <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap" required class="block w-full rounded-lg border-gray-300 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors py-2.5 px-4 dark:text-white">
                         </div>
                         <div class="space-y-1">
                             <label class="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">Umur <span class="text-red-500 ml-1">*</span></label>
@@ -143,16 +162,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         @php
                             $gj_options = [
-                                'Sedih berkepanjangan',
-                                'Mendengar suara bisikan',
+                                'Sedih berkepanjangan dalam waktu lama',
+                                'Kemampuan melakukan kegiatan sehari-hari (kebersihan, makan, minum, aktivitas) berkurang',
+                                'Motivasi untuk melakukan kegiatan menurun (malas)',
+                                'Marah-marah tanpa sebab',
                                 'Bicara atau tertawa sendiri',
-                                'Mengamuk tanpa sebab',
-                                'Mengurung diri di kamar',
-                                'Tidak mau merawat diri (mandi, makan)',
-                                'Ketakutan atau curiga yang berlebihan',
-                                'Sulit tidur terus-menerus',
-                                'Sering lupa (pikun) parah',
-                                'Percobaan bunuh diri / menyakiti diri'
+                                'Mengamuk',
+                                'Menyendiri',
+                                'Tidak mau bergaul',
+                                'Tidak memperhatikan penampilan/kebersihan diri',
+                                'Mengatakan atau mencoba bunuh diri'
                             ];
                         @endphp
                         @foreach($gj_options as $index => $option)
@@ -189,26 +208,57 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                         @php
                             $rmp_options = [
-                                'Kehilangan pekerjaan / PHK',
-                                'Kehamilan / Pasca Melahirkan',
-                                'Memiliki penyakit fisik kronis',
-                                'Masalah ekonomi keluarga yang berat',
-                                'Kehilangan anggota keluarga (kematian)',
-                                'Korban kekerasan dalam rumah tangga (KDRT)'
+                                'Kehilangan anggota keluarga atau orang yang dicintai',
+                                'Kehilangan pekerjaan',
+                                'Kehilangan harta benda',
+                                'Kehilangan anggota tubuh',
+                                'Penyakit fisik kronis hipertensi',
+                                'Penyakit fisik kronis tuberkulosis (TBC)',
+                                'Penyakit fisik kronis diabetes melitus (DM)',
+                                'Penyakit fisik kronis jantung',
+                                'Penyakit fisik kronis ginjal',
+                                'Penyakit fisik kronis reumatik',
+                                'Penyakit fisik kronis stroke',
+                                'Penyakit fisik kronis kanker',
+                                'Hamil',
+                                'Postpartum (melahirkan)',
+                                'Pinjol',
+                                'Judol',
+                                'Kecanduan napza',
+                                'Lainnya(tulis sendiri)'
                             ];
                         @endphp
                         @foreach($rmp_options as $option)
-                        <label class="relative flex items-start p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 ease-in-out hover:bg-orange-50 dark:hover:bg-orange-900/20"
-                               :class="indikator_rmp.includes('{{ $option }}') ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" name="indikator_rmp[]" value="{{ $option }}" x-model="indikator_rmp" class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:ring-offset-gray-800">
-                            </div>
-                            <div class="ml-3 flex-1">
-                                <span class="block text-sm font-medium" :class="indikator_rmp.includes('{{ $option }}') ? 'text-orange-800 dark:text-orange-300' : 'text-gray-700 dark:text-gray-300'">
-                                    {{ $option }}
-                                </span>
-                            </div>
-                        </label>
+                            @if($option === 'Lainnya(tulis sendiri)')
+                                <label class="relative flex flex-col items-start p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 ease-in-out hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                                       :class="indikator_rmp.includes('{{ $option }}') ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'">
+                                    <div class="flex items-center w-full">
+                                        <div class="flex items-center h-5">
+                                            <input type="checkbox" name="indikator_rmp[]" value="{{ $option }}" x-model="indikator_rmp" class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:ring-offset-gray-800">
+                                        </div>
+                                        <div class="ml-3 flex-1">
+                                            <span class="block text-sm font-medium" :class="indikator_rmp.includes('{{ $option }}') ? 'text-orange-800 dark:text-orange-300' : 'text-gray-700 dark:text-gray-300'">
+                                                Lainnya (Tulis Sendiri)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div x-show="indikator_rmp.includes('{{ $option }}')" class="mt-3 w-full" x-transition>
+                                        <input type="text" name="indikator_rmp_lainnya" x-model="lainnya_text" placeholder="Tuliskan keluhan lainnya di sini..." class="block w-full rounded-lg border-orange-300 bg-white dark:bg-gray-700 dark:border-orange-600 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors py-2 px-3 text-sm dark:text-white">
+                                    </div>
+                                </label>
+                            @else
+                                <label class="relative flex items-start p-4 rounded-xl cursor-pointer border-2 transition-all duration-200 ease-in-out hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                                       :class="indikator_rmp.includes('{{ $option }}') ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" name="indikator_rmp[]" value="{{ $option }}" x-model="indikator_rmp" class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:ring-offset-gray-800">
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <span class="block text-sm font-medium" :class="indikator_rmp.includes('{{ $option }}') ? 'text-orange-800 dark:text-orange-300' : 'text-gray-700 dark:text-gray-300'">
+                                            {{ $option }}
+                                        </span>
+                                    </div>
+                                </label>
+                            @endif
                         @endforeach
                     </div>
                 </div>

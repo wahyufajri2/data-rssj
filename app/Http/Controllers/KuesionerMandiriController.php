@@ -91,20 +91,20 @@ class KuesionerMandiriController extends Controller
         $skor_srq = array_sum($validated['srq_answers']);
         $interpretasi_srq = '';
         if ($skor_srq >= 6) {
-            $interpretasi_srq = 'KIP-K, Manajemen faktor risiko, Rujukan';
+            $interpretasi_srq = "1. Mengobrol dari Hati ke Hati dengan Pendamping Terlatih (Konseling)\n2. Meredam Pemicu Stres agar Tidak Semakin Berat (Pencegahan)\n3. Meneruskan Penanganan ke Ahlinya (Rujukan)";
         } else {
-            $interpretasi_srq = 'Edukasi (Pola hidup, Relaksasi, Manajemen Stres, Koping)';
+            $interpretasi_srq = "1. Pertahankan Pola Hidup Sehat\n2. Mengistirahatkan Jiwa dan Raga (Relaksasi)\n3. Mengurai Beban Pikiran (Manajemen Stres)\n4. Menghadapi Masalah dengan Cara yang Sehat (Mekanisme Koping)";
         }
 
         // --- Logika Kebiasaan Sehari-hari ---
         $skor_kebiasaan = array_sum($validated['kebiasaan_answers']);
         $interpretasi_kebiasaan = '';
         if ($skor_kebiasaan >= 25 && $skor_kebiasaan <= 32) {
-            $interpretasi_kebiasaan = 'Kebiasaan Baik';
+            $interpretasi_kebiasaan = 'Baik';
         } elseif ($skor_kebiasaan >= 16 && $skor_kebiasaan <= 24) {
-            $interpretasi_kebiasaan = 'Kebiasaan Cukup';
+            $interpretasi_kebiasaan = 'Cukup';
         } else {
-            $interpretasi_kebiasaan = 'Kebiasaan Kurang'; // 8-15
+            $interpretasi_kebiasaan = 'Kurang'; // 8-15
         }
 
         KuesionerMandiri::create([
