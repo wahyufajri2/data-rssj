@@ -73,6 +73,32 @@
                     </div>
                 </div>
 
+                @if(session()->has('skor_srq') && session('skor_srq') > 0)
+                <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl p-6 text-left border border-emerald-100 dark:border-emerald-800/50 mb-8 space-y-4 transition-colors">
+                    <h3 class="font-bold text-emerald-800 dark:text-emerald-300 border-b border-emerald-200 dark:border-emerald-800/50 pb-2 transition-colors flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Tindak Lanjut yang Disarankan
+                    </h3>
+                    
+                    @if(session('skor_srq') >= 1 && session('skor_srq') <= 5)
+                    <p class="text-sm text-emerald-700 dark:text-emerald-400">Berdasarkan hasil kuesioner Anda, silakan lakukan langkah-langkah berikut secara berurutan:</p>
+                    <ol class="list-decimal list-inside text-sm font-medium text-emerald-800 dark:text-emerald-200 space-y-2 ml-1">
+                        <li>Pertahankan Pola Hidup Sehat</li>
+                        <li>Mengistirahatkan Jiwa dan Raga (Relaksasi)</li>
+                        <li>Mengurai Beban Pikiran (Manajemen Stres)</li>
+                        <li>Menghadapi Masalah dengan Cara yang Sehat (Mekanisme Koping)</li>
+                    </ol>
+                    @elseif(session('skor_srq') >= 6)
+                    <p class="text-sm text-emerald-700 dark:text-emerald-400">Berdasarkan hasil kuesioner Anda, silakan lakukan langkah-langkah penanganan berikut secara berurutan:</p>
+                    <ol class="list-decimal list-inside text-sm font-medium text-emerald-800 dark:text-emerald-200 space-y-2 ml-1">
+                        <li>Mengobrol dari Hati ke Hati dengan Pendamping Terlatih (Konseling)</li>
+                        <li>Meredam Pemicu Stres agar Tidak Semakin Berat (Pencegahan)</li>
+                        <li>Meneruskan Penanganan ke Ahlinya (Rujukan)</li>
+                    </ol>
+                    @endif
+                </div>
+                @endif
+
                 <a href="{{ route('public.kuesioner.create') }}" class="inline-flex justify-center items-center gap-2 rounded-xl bg-emerald-600 px-8 py-3 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors">
                     Kembali ke Halaman Utama
                 </a>
