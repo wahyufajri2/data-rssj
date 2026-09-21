@@ -51,7 +51,9 @@
             ajax: "{{ route('kuesioner.index') }}",
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                { data: 'nama', name: 'nama' },
+                { data: 'nama', name: 'nama', render: function(data, type, row) {
+                    return (type === 'display' && data && data.length > 30) ? '<span title="' + data + '">' + data.substr(0, 30) + '...</span>' : data;
+                }},
                 { data: 'ranting', name: 'ranting.nama_ranting' },
                 { data: 'skor_srq', name: 'skor_srq' },
                 { data: 'skor_kebiasaan', name: 'skor_kebiasaan' },

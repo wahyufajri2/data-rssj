@@ -52,10 +52,14 @@
             columns: [
                 { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                 { data: 'no_kk', name: 'no_kk' },
-                { data: 'nama_lengkap', name: 'nama_lengkap' },
+                { data: 'nama_lengkap', name: 'nama_lengkap', render: function(data, type, row) {
+                    return (type === 'display' && data && data.length > 30) ? '<span title="' + data + '">' + data.substr(0, 30) + '...</span>' : data;
+                }},
                 { data: 'ranting', name: 'ranting.nama_ranting' },
                 { data: 'status_kesehatan', name: 'status_kesehatan' },
-                { data: 'alamat', name: 'alamat_dusun' }, // or search by both alamat_dusun and no_rumah depending on requirements, but name field matches main column
+                { data: 'alamat', name: 'alamat_dusun', render: function(data, type, row) {
+                    return (type === 'display' && data && data.length > 40) ? '<span title="' + data + '">' + data.substr(0, 40) + '...</span>' : data;
+                }},
                 { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' }
             ],
             language: window.dtLangID,
