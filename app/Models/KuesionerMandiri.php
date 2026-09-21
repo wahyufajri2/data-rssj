@@ -30,12 +30,16 @@ class KuesionerMandiri extends Model
         'interpretasi_srq',
         'skor_kebiasaan',
         'interpretasi_kebiasaan',
+        'srq_answers',
+        'kebiasaan_answers',
     ];
 
     protected function casts(): array
     {
         return [
             'tanggal_mengisi' => 'date',
+            'srq_answers' => 'array',
+            'kebiasaan_answers' => 'array',
         ];
     }
 

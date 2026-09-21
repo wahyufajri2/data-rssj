@@ -10,7 +10,7 @@
             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
             <div class="relative p-8 sm:p-10 text-white flex flex-col sm:flex-row items-center justify-between">
                 <div>
-                    <h2 class="text-3xl font-extrabold tracking-tight mb-2">Kuesioner Mandiri</h2>
+                    <h2 class="text-3xl font-extrabold tracking-tight mb-2">Edit Kuesioner Mandiri</h2>
                     <p class="text-blue-100 text-lg">Skrining Kesehatan Jiwa & Kebiasaan Sehari-hari</p>
                 </div>
                 <div class="mt-4 sm:mt-0 opacity-80">
@@ -38,7 +38,8 @@
             </div>
         @endif
 
-        <form action="{{ route('kuesioner.store') }}" method="POST" @submit="if(step === 2) submitForm($event)" class="relative pb-24">
+        <form action="{{ route('kuesioner.update', $kuesioner->id) }}" method="POST">
+            @method('PUT') @submit="if(step === 2) submitForm($event)" class="relative pb-24">
             @csrf
 
             <!-- ================= STEP 1 ================= -->
@@ -63,7 +64,7 @@
                             <select id="ranting-select" name="ranting_id" class="block w-full rounded-lg border-indigo-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 py-3 px-4" :required="step === 1">
                                 <option value="">-- Silakan Pilih --</option>
                                 @foreach($rantings as $ranting)
-                                    <option value="{{ $ranting->id }}" {{ old('ranting_id') == $ranting->id ? 'selected' : '' }}>Ranting {{ $ranting->nama_ranting }}</option>
+                                    <option value="{{ $ranting->id }}" {{ old('ranting_id', $kuesioner->ranting_id) == $ranting->id ? 'selected' : '' }}>Ranting {{ $ranting->nama_ranting }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -72,11 +73,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Nama Lengkap <span class="text-red-500">*</span></label>
-                                <input type="text" name="nama" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" name="nama" :required="step === 1"  value="{{ old('nama', $kuesioner->nama) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">NIK (16 Digit) <span class="text-red-500">*</span></label>
-                                <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" name="nik" :required="step === 1" maxlength="16" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" name="nik" :required="step === 1" maxlength="16"  value="{{ old('nik', $kuesioner->nik) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Mengisi <span class="text-red-500">*</span></label>
@@ -86,59 +87,59 @@
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Jenis Kelamin <span class="text-red-500">*</span></label>
                                 <select name="jenis_kelamin" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     <option value="">Pilih</option>
-                                    <option value="Laki-laki">Laki-laki</option>
-                                    <option value="Perempuan">Perempuan</option>
+                                    <option value="Laki-laki" {{ old('jenis_kelamin', $kuesioner->jenis_kelamin) == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                    <option value="Perempuan" {{ old('jenis_kelamin', $kuesioner->jenis_kelamin) == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                                 </select>
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Status Kawin <span class="text-red-500">*</span></label>
                                 <select name="status_kawin" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     <option value="">Pilih</option>
-                                    <option value="Belum Kawin">Belum Kawin</option>
-                                    <option value="Kawin">Kawin</option>
-                                    <option value="Cerai Hidup">Cerai Hidup</option>
-                                    <option value="Cerai Mati">Cerai Mati</option>
+                                    <option value="Belum Kawin" {{ old('status_kawin', $kuesioner->status_kawin) == 'Belum Kawin' ? 'selected' : '' }}>Belum Kawin</option>
+                                    <option value="Kawin" {{ old('status_kawin', $kuesioner->status_kawin) == 'Kawin' ? 'selected' : '' }}>Kawin</option>
+                                    <option value="Cerai Hidup" {{ old('status_kawin', $kuesioner->status_kawin) == 'Cerai Hidup' ? 'selected' : '' }}>Cerai Hidup</option>
+                                    <option value="Cerai Mati" {{ old('status_kawin', $kuesioner->status_kawin) == 'Cerai Mati' ? 'selected' : '' }}>Cerai Mati</option>
                                 </select>
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Umur <span class="text-red-500">*</span></label>
                                 <div class="relative">
-                                    <input type="number" name="umur" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                    <input type="number" name="umur" :required="step === 1"  value="{{ old('umur', $kuesioner->umur) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500">Thn</span>
                                 </div>
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah Anak <span class="text-red-500">*</span></label>
-                                <input type="number" name="jumlah_anak" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="number" name="jumlah_anak" :required="step === 1"  value="{{ old('jumlah_anak', $kuesioner->jumlah_anak) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Pendidikan <span class="text-red-500">*</span></label>
                                 <select name="pendidikan" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                     <option value="">Pilih</option>
-                                    <option value="Tidak Sekolah">Tidak Sekolah</option>
-                                    <option value="SD">SD</option>
-                                    <option value="SMP">SMP</option>
-                                    <option value="SMA">SMA</option>
-                                    <option value="Diploma">Diploma</option>
-                                    <option value="S1">S1</option>
-                                    <option value="S2/S3">S2/S3</option>
+                                    <option value="Tidak Sekolah" {{ old('pendidikan', $kuesioner->pendidikan) == 'Tidak Sekolah' ? 'selected' : '' }}>Tidak Sekolah</option>
+                                    <option value="SD" {{ old('pendidikan', $kuesioner->pendidikan) == 'SD' ? 'selected' : '' }}>SD</option>
+                                    <option value="SMP" {{ old('pendidikan', $kuesioner->pendidikan) == 'SMP' ? 'selected' : '' }}>SMP</option>
+                                    <option value="SMA" {{ old('pendidikan', $kuesioner->pendidikan) == 'SMA' ? 'selected' : '' }}>SMA</option>
+                                    <option value="Diploma" {{ old('pendidikan', $kuesioner->pendidikan) == 'Diploma' ? 'selected' : '' }}>Diploma</option>
+                                    <option value="S1" {{ old('pendidikan', $kuesioner->pendidikan) == 'S1' ? 'selected' : '' }}>S1</option>
+                                    <option value="S2/S3" {{ old('pendidikan', $kuesioner->pendidikan) == 'S2/S3' ? 'selected' : '' }}>S2/S3</option>
                                 </select>
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Pekerjaan <span class="text-red-500">*</span></label>
-                                <input type="text" name="pekerjaan" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" name="pekerjaan" :required="step === 1" value="{{ old('pekerjaan', $kuesioner->pekerjaan) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">No HP <span class="text-red-500">*</span></label>
-                                <input type="text" name="no_hp" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" name="no_hp" :required="step === 1"  value="{{ old('no_hp', $kuesioner->no_hp) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Agama <span class="text-red-500">*</span></label>
-                                <input type="text" name="agama" :required="step === 1" value="Islam" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" name="agama" :required="step === 1" value="{{ old('agama', $kuesioner->agama) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Alamat Lengkap <span class="text-red-500">*</span></label>
-                                <input type="text" name="alamat" :required="step === 1" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <input type="text" name="alamat" :required="step === 1"  value="{{ old('alamat', $kuesioner->alamat) }}" class="block w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 py-2.5 px-4 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                             </div>
                         </div>
                     </div>
@@ -238,7 +239,7 @@
                                 'Menghadiri pengajian/kajian agama',
                                 'Minum air putih minimal 8 gelas',
                                 'Tidur malam 6-8 jam',
-                                'Membaca Al Qur\'an',
+                                "Membaca Al Qur'an",
                                 'Makan buah setiap hari',
                                 'Makan sayur setiap hari',
                                 'Aktifitas fisik minimal 30 menit sehari'
@@ -377,8 +378,8 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('kuesionerForm', () => ({
             step: 1,
-            srq_answers: Array(20).fill(null),
-            kebiasaan_answers: Array(8).fill(null),
+            srq_answers: {!! json_encode(old('srq_answers', $kuesioner->srq_answers ?? array_fill(0, 20, null))) !!},
+            kebiasaan_answers: {!! json_encode(old('kebiasaan_answers', $kuesioner->kebiasaan_answers ?? array_fill(0, 8, null))) !!},
             
             submitForm(e) {
                 e.preventDefault();

@@ -127,10 +127,108 @@ class KuesionerMandiriController extends Controller
             'interpretasi_srq' => $interpretasi_srq,
             'skor_kebiasaan' => $skor_kebiasaan,
             'interpretasi_kebiasaan' => $interpretasi_kebiasaan,
+            'srq_answers' => $validated['srq_answers'],
+            'kebiasaan_answers' => $validated['kebiasaan_answers'],
         ]);
 
         return redirect()->route('kuesioner.index')->with('success', 'Data kuesioner berhasil disimpan.');
     }
 
+    public function show($id)
+    {
+        $kuesioner = KuesionerMandiri::with(['user', 'ranting'])->findOrFail($id);
+        
+        if (Auth::user()->role === 'admin_ranting' && $kuesioner->ranting_id !== Auth::user()->ranting_id) {
+            abort(403, 'Unauthorized action.');
+        }
 
+        return view('kuesioner.show', compact('kuesioner'));
+    }
+
+    public function edit($id)
+    {
+        $kuesioner = KuesionerMandiri::findOrFail($id);
+
+        if (Auth::user()->role === 'admin_ranting' && $kuesioner->ranting_id !== Auth::user()->ranting_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $rantings = \App\Models\Ranting::all();
+        return view('kuesioner.edit', compact('kuesioner', 'rantings'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $kuesioner = KuesionerMandiri::findOrFail($id);
+
+        if (Auth::user()->role === 'admin_ranting' && $kuesioner->ranting_id !== Auth::user()->ranting_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'tanggal_mengisi' => 'required|date',
+            'jenis_kelamin' => 'required|string',
+            'status_kawin' => 'required|string',
+            'umur' => 'required|integer|min:0',
+            'jumlah_anak' => 'required|integer|min:0',
+            'pendidikan' => 'required|string',
+            'no_hp' => 'required|string',
+            'pekerjaan' => 'required|string',
+            'nik' => 'required|string|max:16',
+            'agama' => 'required|string',
+            'alamat' => 'required|string',
+            'srq_answers' => 'required|array|size:20', 
+            'srq_answers.*' => 'required|integer|in:0,1',
+            'kebiasaan_answers' => 'required|array|size:8',
+            'kebiasaan_answers.*' => 'required|integer|between:1,4',
+        ]);
+
+        if (Auth::user()->role === 'superadmin') {
+            $request->validate(['ranting_id' => 'required|exists:rantings,id']);
+            $validated['ranting_id'] = $request->input('ranting_id');
+        }
+
+        // --- Logika SRQ-20 ---
+        $skor_srq = array_sum($validated['srq_answers']);
+        $interpretasi_srq = '';
+        if ($skor_srq >= 6) {
+            $interpretasi_srq = "1. Mengobrol dari Hati ke Hati dengan Pendamping Terlatih (Konseling)\n2. Meredam Pemicu Stres agar Tidak Semakin Berat (Pencegahan)\n3. Meneruskan Penanganan ke Ahlinya (Rujukan)";
+        } else {
+            $interpretasi_srq = "1. Pertahankan Pola Hidup Sehat\n2. Mengistirahatkan Jiwa dan Raga (Relaksasi)\n3. Mengurai Beban Pikiran (Manajemen Stres)\n4. Menghadapi Masalah dengan Cara yang Sehat (Mekanisme Koping)";
+        }
+
+        // --- Logika Kebiasaan Sehari-hari ---
+        $skor_kebiasaan = array_sum($validated['kebiasaan_answers']);
+        $interpretasi_kebiasaan = '';
+        if ($skor_kebiasaan >= 25 && $skor_kebiasaan <= 32) {
+            $interpretasi_kebiasaan = 'Baik';
+        } elseif ($skor_kebiasaan >= 16 && $skor_kebiasaan <= 24) {
+            $interpretasi_kebiasaan = 'Cukup';
+        } else {
+            $interpretasi_kebiasaan = 'Kurang'; // 8-15
+        }
+
+        $validated['skor_srq'] = $skor_srq;
+        $validated['interpretasi_srq'] = $interpretasi_srq;
+        $validated['skor_kebiasaan'] = $skor_kebiasaan;
+        $validated['interpretasi_kebiasaan'] = $interpretasi_kebiasaan;
+
+        $kuesioner->update($validated);
+
+        return redirect()->route('kuesioner.index')->with('success', 'Data kuesioner berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $kuesioner = KuesionerMandiri::findOrFail($id);
+
+        if (Auth::user()->role === 'admin_ranting' && $kuesioner->ranting_id !== Auth::user()->ranting_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $kuesioner->delete();
+
+        return redirect()->route('kuesioner.index')->with('success', 'Data kuesioner berhasil dihapus.');
+    }
 }
